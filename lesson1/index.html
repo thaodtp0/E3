@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3_Lesson 1</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <style>
+        *, body, html, button, span, h1, h2, h3, p, div, input, textarea, select { 
+            font-family: 'Quicksand', sans-serif; 
+            font-weight: 600;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .perspective { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .card-inner { transition: transform 0.5s; transform-style: preserve-3d; }
+        .card-flipped { transform: rotateY(180deg); }
+        .disabled-tab { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; }
+        
+        /* Floating Area Core Mechanics */
+        #word-bank-arena {
+            position: relative;
+            overflow: hidden;
+        }
+        .floating-tile {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            white-space: nowrap;
+            will-change: left, top;
+        }
+        .floating-tile:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            z-index: 50;
+        }
+        .drop-zone-active {
+            background-color: #f0fdf4 !important;
+            border-color: #4ade80 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#f7f9fc] text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200 pb-12">
+
+    <!-- CLASSROOM HEADER -->
+    <header class="bg-gradient-to-r from-[#FFDEE9] via-[#FFE5E5] to-[#B5FFFC] border-b-4 border-dashed border-amber-200 shadow-sm p-6 text-center rounded-b-3xl">
+        <h1 class="text-3xl md:text-4xl font-black tracking-wide drop-shadow-sm text-indigo-900">✨ E3_Lesson 1 ✨</h1>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-4xl w-full mx-auto px-4 mt-6">
+        <div class="flex bg-amber-100/70 p-1.5 rounded-2xl border border-amber-200 shadow-inner overflow-x-auto">
+            <button onclick="switchTab('reference')" id="btn-reference" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center bg-white text-amber-600 shadow-sm transition cursor-pointer whitespace-nowrap">📚 Word Bank</button>
+            <button onclick="switchTab('flashcard')" id="btn-flashcard" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition cursor-pointer whitespace-nowrap">🎴 Flashcards</button>
+            <button onclick="switchTab('gapfill')" id="btn-gapfill" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">✏️ Gap Fill</button>
+            <button onclick="switchTab('arrange')" id="btn-arrange" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🎮 Unscramble</button>
+        </div>
+    </div>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        
+        <!-- SECTION 0: VOCABULARY REFERENCE TABLE -->
+        <section id="tab-reference" class="tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div>
+                    <h2 class="text-2xl font-black text-indigo-900 font-heading">📖 E3_Lesson 1_Vocabulary List</h2>
+                    <p class="text-sm text-slate-500 mt-1">Review all words and example sentences before starting the practice activities.</p>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead>
+                            <tr class="bg-indigo-50 border-b border-slate-200 text-indigo-900 text-xs uppercase tracking-wider font-black">
+                                <th class="p-3.5">Vocabulary</th>
+                                <th class="p-3.5">Meaning (Tiếng Việt)</th>
+                                <th class="p-3.5">IPA</th>
+                                <th class="p-3.5">Example Sentence (A2)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reference-table-body" class="divide-y divide-slate-100 text-xs md:text-sm">
+                            <!-- Dynamic Content Inserted Here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="switchTab('flashcard')" class="px-8 py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl text-sm shadow-sm transition cursor-pointer">Start Flashcards ➔</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TASK 1: FLASHCARDS -->
+        <section id="tab-flashcard" class="tab-content hidden space-y-6">
+            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-amber-300 shadow-sm flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-black text-slate-600">Progress: <span id="progress-text" class="text-amber-500">0/0</span></div>
+                <div class="w-full sm:w-1/3 bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <button onclick="resetProgress()" class="text-xs text-rose-500 hover:underline font-black cursor-pointer">🔄 Reset Progress</button>
+            </div>
+            
+            <div id="flashcard-container">
+                <div id="card-arena" class="perspective w-full max-w-md mx-auto h-[420px] cursor-pointer">
+                    <div id="flashcard-inner" onclick="flipCard()" class="card-inner w-full h-full relative border-4 border-amber-400 rounded-3xl shadow-md bg-white">
+                        <!-- Front View -->
+                        <div class="backface-hidden absolute inset-0 p-6 flex flex-col justify-between items-center text-center bg-amber-50/30 rounded-[20px]">
+                            <span class="text-xs font-black text-amber-600 uppercase tracking-widest bg-amber-100 px-4 py-1.5 rounded-full">English Word</span>
+                            <div class="space-y-4 my-auto w-full">
+                                <h2 id="f-word" class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight"></h2>
+                                <div class="flex justify-center items-center space-x-2">
+                                    <span id="f-ipa" class="text-indigo-600 font-bold text-base md:text-lg"></span>
+                                    <button onclick="speakWord(event)" class="w-10 h-10 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full transition flex items-center justify-center text-lg cursor-pointer shadow-sm">🔊</button>
+                                </div>
+                                <p id="f-example" class="text-slate-700 text-sm md:text-base border-t-2 border-dashed border-amber-200 pt-4 px-2 leading-relaxed font-medium bg-white rounded-xl p-3 shadow-sm"></p>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold">👉 Tap card to flip! 👈</p>
+                        </div>
+                        <!-- Back View -->
+                        <div class="backface-hidden w-full h-full absolute inset-0 p-6 flex flex-col justify-between bg-slate-900 text-white rounded-[22px]" style="transform: rotateY(180deg);">
+                            <span class="text-xs font-black text-amber-400 uppercase tracking-widest bg-slate-800 px-4 py-1.5 rounded-full w-max mx-auto">Vietnamese Meaning</span>
+                            <div class="my-auto space-y-5 text-center">
+                                <div>
+                                    <span class="text-xs uppercase font-black text-slate-400 block mb-1 tracking-wider">Meaning:</span>
+                                    <h3 id="f-vi" class="text-2xl md:text-3xl font-black text-amber-300"></h3>
+                                </div>
+                            </div>
+                            <p class="text-xs text-center text-slate-500 font-bold">Tap again to flip back</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Anki Controls -->
+                <div id="anki-controls" class="w-full max-w-md mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-4 gap-2 mt-6">
+                    <button onclick="handleAnkiAction('again')" class="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-rose-600">Again</span><span class="text-[10px] text-rose-400 font-bold block mt-0.5">&lt;1m</span></button>
+                    <button onclick="handleAnkiAction('hard')" class="p-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-amber-600">Hard</span><span class="text-[10px] text-amber-400 font-bold block mt-0.5">&lt;10m</span></button>
+                    <button onclick="handleAnkiAction('good')" class="p-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-indigo-600">Good</span><span class="text-[10px] text-indigo-400 font-bold block mt-0.5">1d</span></button>
+                    <button onclick="handleAnkiAction('easy')" class="p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-center transition shadow-sm cursor-pointer"><span class="block text-xs font-black text-emerald-600">Easy</span><span class="text-[10px] text-emerald-400 font-bold block mt-0.5">4d</span></button>
+                </div>
+            </div>
+
+            <!-- Flashcard Completion Screen -->
+            <div id="flashcard-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎈🦄🎈</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Flashcards Completed!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">Awesome! You have reviewed all flashcards. Let's move on to the Gap Fill exercise!</p>
+                <button onclick="unlockAndGoToGapfill()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Play Gap Fill Exercise ➔</button>
+            </div>
+        </section>
+
+        <!-- TASK 2: GAP FILL EXERCISE (15 KEY ITEMS) -->
+        <section id="tab-gapfill" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-indigo-100 text-indigo-700 font-black px-4 py-1.5 rounded-full tracking-wide">Task 2: Practice</span>
+                    <h3 class="text-2xl font-heading font-black text-slate-900">Fill in the Blanks</h3>
+                    <p class="text-sm text-slate-500 font-medium max-w-xl mx-auto">Complete the sentences using the core words from Lesson 1. Pay attention to grammar (Present Simple, Past Simple, etc.)!</p>
+                </div>
+
+                <div id="gapfill-questions-container" class="space-y-4">
+                    <!-- Dynamic Gap Fill Questions -->
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="checkGapFillAnswers()" class="px-10 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl shadow-md transition cursor-pointer">Check Answers</button>
+                </div>
+
+                <div id="gapfill-feedback" class="p-4 rounded-2xl text-center font-black hidden"></div>
+            </div>
+
+            <div id="gapfill-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎯🎉🌟</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Great Job!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">You passed the gap-fill challenge! Now you're ready for the Sentence Unscramble game!</p>
+                <button onclick="unlockAndGoToArrange()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Play Sentence Unscramble ➔</button>
+            </div>
+        </section>
+
+        <!-- TASK 3: UNSCRAMBLE SENTENCES GAME -->
+        <section id="tab-arrange" class="tab-content hidden space-y-6">
+            <div id="arrange-workspace" class="space-y-6">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center flex-wrap gap-2">
+                    <div class="flex items-center space-x-3">
+                        <span class="bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-xl text-xs font-black uppercase">Sentence <span id="arr-current-num">1</span>/10</span>
+                        <div class="text-sm font-black text-slate-600">Score: <span id="arr-score-text" class="text-emerald-500 font-black">0</span> ⭐</div>
+                    </div>
+                    <p class="text-xs font-bold text-slate-400 italic">Click or drag words into the drop area to build the correct sentence!</p>
+                </div>
+
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 text-center">
+                    <span class="text-xs font-black text-amber-700 bg-amber-200/60 px-3 py-1 rounded-full uppercase tracking-wider">Vietnamese Meaning</span>
+                    <p id="arr-vi-hint" class="text-slate-800 font-bold text-base md:text-lg mt-2 leading-relaxed"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-indigo-950 uppercase tracking-wider">☁️ Word Bank (Click or drag tiles):</label>
+                    <div id="word-bank-arena" class="w-full h-[220px] bg-sky-50/50 border-4 border-dashed border-sky-300 rounded-2xl shadow-inner relative">
+                        <!-- Floating tiles inserted here -->
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-indigo-950 uppercase tracking-wider">📥 Arranged Sentence:</label>
+                    <div id="sentence-drop-zone" ondragover="allowDrop(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="w-full min-h-[100px] bg-white border-4 border-dashed border-slate-300 rounded-2xl p-4 flex flex-wrap gap-2.5 items-center justify-center transition shadow-inner">
+                        <!-- Dropped tiles go here -->
+                    </div>
+                </div>
+
+                <div id="arrange-feedback" class="text-center font-black text-base py-3 rounded-xl border hidden transition-all duration-300"></div>
+
+                <div class="flex justify-between items-center gap-3">
+                    <button onclick="resetCurrentSentenceGame()" class="px-5 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black rounded-xl text-sm transition cursor-pointer">🔄 Clear</button>
+                    <div class="flex space-x-2">
+                        <button id="arr-check-btn" onclick="checkArrangedSentence()" class="px-7 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm transition shadow-sm cursor-pointer">Check</button>
+                        <button id="arr-next-btn" onclick="nextArrangeQuestion()" class="px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-sm transition shadow-sm cursor-pointer hidden">Next Question ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINAL CONGRATULATIONS CARD AFTER UNSCRAMBLE -->
+            <div id="arrange-success-box" class="bg-slate-900 text-white p-8 rounded-3xl max-w-md mx-auto text-center space-y-4 hidden shadow-xl border-4 border-amber-400">
+                <span class="text-6xl block animate-bounce">🦄🏆🌟</span>
+                <h3 class="text-2xl font-heading font-black text-amber-300">Lesson 1 Accomplished!</h3>
+                <p class="text-slate-300 font-medium text-base leading-relaxed">Congratulations! You have mastered all vocabulary and successfully built all sentences!</p>
+                <div class="pt-4 border-t border-slate-800">
+                    <button onclick="restartEntireSession()" class="text-xs font-black text-amber-400 underline hover:text-amber-500 cursor-pointer tracking-wide">Restart Lesson 1 Practice</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // MASTER VOCABULARY LIST (E3_Lesson 1)
+        const vocabularyData = [
+            // People & Relationships
+            { word: "children", ipa: "/ˈtʃɪldrən/", vi: "trẻ em, con cái", ex: "The children are playing happily in the park." },
+            { word: "colleagues", ipa: "/ˈkɒliːɡz/", vi: "đồng nghiệp", ex: "I usually have lunch with my colleagues at work." },
+            { word: "couple", ipa: "/ˈkʌpl/", vi: "cặp đôi, vợ chồng", ex: "That young couple lives next door to my house." },
+            { word: "friends", ipa: "/frendz/", vi: "bạn bè", ex: "We are good friends and always help each other." },
+            { word: "grandparents", ipa: "/ˈɡrænpeərənts/", vi: "ông bà", ex: "My grandparents live in a quiet countryside village." },
+            { word: "parents", ipa: "/ˈpeərənts/", vi: "bố mẹ", ex: "My parents are working hard to support our family." },
+            { word: "relatives", ipa: "/ˈrelətɪvz/", vi: "họ hàng", ex: "All my relatives visit us during the New Year holiday." },
+            { word: "strangers", ipa: "/ˈstreɪndʒəz/", vi: "người lạ", ex: "Don't accept food or drinks from strangers." },
+            { word: "students", ipa: "/ˈstjuːdnts/", vi: "học sinh, sinh viên", ex: "The students are listening carefully to the lesson." },
+            { word: "teacher", ipa: "/ˈtiːtʃə(r)/", vi: "giáo viên", ex: "Our teacher explains everything very clearly." },
+            
+            // Personal Types & Hobbies
+            { word: "animal lover", ipa: "/ˈænɪml ˈlʌvə(r)/", vi: "người yêu động vật", ex: "She is an animal lover and has three cats." },
+            { word: "foodie", ipa: "/ˈfuːdi/", vi: "người sành ăn", ex: "As a foodie, he loves trying new street food." },
+            { word: "traveler", ipa: "/ˈtrævlə(r)/", vi: "người thích đi du lịch", ex: "My brother is a traveler who has visited 10 countries." },
+            { word: "sports fan", ipa: "/spɔːts fæn/", vi: "người hâm mộ thể thao", ex: "My dad is a big sports fan and watches football every weekend." },
+            { word: "social person", ipa: "/ˈsəʊʃl ˈpɜːsn/", vi: "người hòa đồng, thích giao tiếp", ex: "She is a social person who makes friends easily." },
+            { word: "bookworm", ipa: "/ˈbʊkwɜːm/", vi: "mọt sách", ex: "He is a real bookworm; he reads two books a week." },
+            { word: "gamer", ipa: "/ˈɡeɪmə(r)/", vi: "người chơi điện tử", ex: "Many teenagers become gamers in their free time." },
+            { word: "blogger", ipa: "/ˈblɒɡə(r)/", vi: "người viết blog", ex: "The travel blogger shares great pictures of her trips." },
+            { word: "music lover", ipa: "/ˈmjuːzɪk ˈlʌvə(r)/", vi: "người yêu âm nhạc", ex: "My friend is a music lover and plays guitar well." },
+            { word: "outdoor person", ipa: "/ˈaʊtdɔː(r) ˈpɜːsn/", vi: "người thích hoạt động ngoài trời", ex: "An outdoor person usually enjoys hiking and camping." },
+
+            // Character Traits
+            { word: "creative", ipa: "/kriˈeɪtɪv/", vi: "sáng tạo", ex: "She is very creative and draws beautiful paintings." },
+            { word: "friendly", ipa: "/ˈfrendli/", vi: "thân thiện", ex: "The new neighbor is always friendly and polite." },
+            { word: "funny", ipa: "/ˈfʌni/", vi: "hài hước", ex: "He tells funny stories that make everyone laugh." },
+            { word: "generous", ipa: "/ˈdʒenərəs/", vi: "rộng lượng, hào phóng", ex: "My grandmother is generous and often gives gifts." },
+            { word: "kind", ipa: "/kaɪnd/", vi: "tốt bụng", ex: "Thank you for your help; you are very kind." },
+            { word: "organized", ipa: "/ˈɔːɡənaɪzd/", vi: "có tổ chức, ngăn nắp", ex: "An organized student keeps their desk clean." },
+            { word: "patient", ipa: "/ˈpeɪʃnt/", vi: "kiên nhẫn", ex: "Teachers need to be patient with young learners." },
+            { word: "quiet", ipa: "/ˈkwaɪət/", vi: "trầm tính, yên lặng", ex: "He is a quiet boy who doesn't talk very much." },
+            { word: "responsible", ipa: "/rɪˈspɒnsəbl/", vi: "có trách nhiệm", ex: "She is a responsible student who completes all tasks." },
+            { word: "serious", ipa: "/ˈsɪəriəs/", vi: "nghiêm túc", ex: "He looks serious when he works on important projects." },
+            { word: "shy", ipa: "/ʃaɪ/", vi: "nhút nhát", ex: "The shy girl hid behind her mother when we met." },
+            { word: "talkative", ipa: "/ˈtɔːkətɪv/", vi: "nói nhiều, hay trò chuyện", ex: "My seatmate is talkative and talks all day." },
+
+            // Verb Phrases / Life Events
+            { word: "have children", ipa: "/hæv ˈtʃɪldrən/", vi: "có con", ex: "They want to have children after buying a house." },
+            { word: "go to college", ipa: "/ɡəʊ tə ˈkɒlɪdʒ/", vi: "học đại học", ex: "Many high school students plan to go to college." },
+            { word: "get a job", ipa: "/ɡet ə dʒɒb/", vi: "tìm/có việc làm", ex: "He wants to get a job in a technology company." },
+            { word: "get married", ipa: "/ɡet ˈmærid/", vi: "kết hôn", ex: "My cousin is going to get married next summer." },
+            { word: "leave home", ipa: "/liːv həʊm/", vi: "rời gia đình sống tự lập", ex: "At age 18, many young people leave home for university." },
+            { word: "fall in love", ipa: "/fɔːl ɪn lʌv/", vi: "phải lòng, yêu", ex: "They fell in love while they were working together." },
+            { word: "retire", ipa: "/rɪˈtaɪə(r)/", vi: "nghỉ hưu", ex: "My grandfather plans to retire at the age of 65." }
+        ];
+
+        // TASK 2: 15 GAP-FILL ITEMS
+        const gapFillData = [
+            { id: 1, sentence: "My sister reads books every evening because she is a real ________.", answer: "bookworm", hint: "mọt sách" },
+            { id: 2, sentence: "Our ________ explains grammar very clearly in every lesson.", answer: "teacher", hint: "giáo viên" },
+            { id: 3, sentence: "They met at university and decided to ________ last year.", answer: "get married", hint: "kết hôn" },
+            { id: 4, sentence: "He is a ________ person who enjoys making new friends.", answer: "social person", hint: "người hòa đồng" },
+            { id: 5, sentence: "My ________ live in the countryside, so I visit them on weekends.", answer: "grandparents", hint: "ông bà" },
+            { id: 6, sentence: "After finishing high school, she wants to ________ in London.", answer: "go to college", hint: "học đại học" },
+            { id: 7, sentence: "Be ________ when teaching children because they learn slowly.", answer: "patient", hint: "kiên nhẫn" },
+            { id: 8, sentence: "He works hard at university so he can ________ after graduation.", answer: "get a job", hint: "có việc làm" },
+            { id: 9, sentence: "She is an ________ and loves rescuing stray dogs.", answer: "animal lover", hint: "người yêu động vật" },
+            { id: 10, sentence: "He feels ________ when speaking in front of a big group.", answer: "shy", hint: "nhút nhát" },
+            { id: 11, sentence: "My uncle worked for 40 years before he decided to ________.", answer: "retire", hint: "nghỉ hưu" },
+            { id: 12, sentence: "They ________ with each other during their trip to France.", answer: "fell in love", hint: "yêu/phải lòng" },
+            { id: 13, sentence: "An ________ student always plans their study schedule well.", answer: "organized", hint: "có tổ chức" },
+            { id: 14, sentence: "He is very ________ and always shares his food with friends.", answer: "generous", hint: "hào phóng" },
+            { id: 15, sentence: "My ________ at the office are very helpful and friendly.", answer: "colleagues", hint: "đồng nghiệp" }
+        ];
+
+        // TASK 3: UNSCRAMBLE POOL
+        const gameSentencesPool = [
+            { id: 0, target: "My grandparents live in a small village .", vi: "Ông bà của tôi sống ở một ngôi làng nhỏ." },
+            { id: 1, target: "She is a bookworm because she loves reading .", vi: "Cô ấy là một mọt sách vì cô ấy thích đọc sách." },
+            { id: 2, target: "They got married after finishing college last year .", vi: "Họ đã kết hôn sau khi học xong đại học năm ngoái." },
+            { id: 3, target: "Our teacher is very patient with all students .", vi: "Giáo viên của chúng tôi rất kiên nhẫn với tất cả học sinh." },
+            { id: 4, sentence: "He wants to get a job in Hanoi .", target: "He wants to get a job in Hanoi .", vi: "Anh ấy muốn tìm một công việc ở Hà Nội." },
+            { id: 5, target: "An animal lover usually takes good care of pets .", vi: "Một người yêu động vật thường chăm sóc tốt cho thú cưng." },
+            { id: 6, target: "My uncle plans to retire next summer .", vi: "Chú của tôi có kế hoạch nghỉ hưu vào mùa hè tới." },
+            { id: 7, target: "She is friendly and makes friends very easily .", vi: "Cô ấy thân thiện và kết bạn rất dễ dàng." },
+            { id: 8, target: "They fell in love while working together .", vi: "Họ đã yêu nhau trong khi làm việc cùng nhau." },
+            { id: 9, target: "Generous people always share things with others .", vi: "Những người hào phóng luôn chia sẻ mọi thứ với người khác." }
+        ];
+
+        // UNLOCK STATES
+        let gapfillUnlocked = false;
+        let arrangeUnlocked = false;
+
+        let flashcardStates = vocabularyData.map(v => ({ word: v.word, done: false }));
+        let currentFlashcardIndex = 0;
+
+        let arrangeCurrentIndex = 0;
+        let arrangeScore = 0;
+
+        let animatedObjects = [];
+        let animationFrameId = null;
+
+        const pastelColors = [
+            'bg-pink-100 text-pink-700 border-pink-300 hover:bg-pink-200',
+            'bg-orange-100 text-orange-700 border-orange-300 hover:bg-orange-200',
+            'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200',
+            'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200',
+            'bg-sky-100 text-sky-700 border-sky-300 hover:bg-sky-200',
+            'bg-indigo-100 text-indigo-700 border-indigo-300 hover:bg-indigo-200',
+            'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200'
+        ];
+
+        window.onload = function() {
+            renderReferenceTable();
+            renderGapFillQuestions();
+            updateFlashcardUI();
+        };
+
+        function renderReferenceTable() {
+            const tbody = document.getElementById('reference-table-body');
+            tbody.innerHTML = vocabularyData.map(v => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3.5 font-black text-indigo-950">${v.word}</td>
+                    <td class="p-3.5 font-bold text-slate-700">${v.vi}</td>
+                    <td class="p-3.5 text-indigo-600 font-bold">${v.ipa}</td>
+                    <td class="p-3.5 text-slate-600">${v.ex}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tabId) {
+            if (tabId === 'gapfill' && !gapfillUnlocked) return;
+            if (tabId === 'arrange' && !arrangeUnlocked) return;
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-amber-600', 'shadow-sm');
+                el.classList.add('text-slate-500');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500');
+
+            if (tabId !== 'arrange') {
+                stopFloatingAnimationLoop();
+            } else {
+                setTimeout(() => {
+                    initArrangeSentenceGame();
+                }, 60);
+            }
+        }
+
+        /* --- FLASHCARD SYSTEM --- */
+        function updateFlashcardUI() {
+            const undoneCards = flashcardStates.filter(c => !c.done);
+            const total = flashcardStates.length;
+            const completed = total - undoneCards.length;
+            
+            document.getElementById('progress-text').innerText = `${completed}/${total}`;
+            document.getElementById('progress-bar').style.width = `${(completed / total) * 100}%`;
+
+            if (undoneCards.length === 0) {
+                document.getElementById('flashcard-container').classList.add('hidden');
+                document.getElementById('flashcard-success-box').classList.remove('hidden');
+                gapfillUnlocked = true;
+                document.getElementById('btn-gapfill').classList.remove('disabled-tab');
+                return;
+            }
+
+            document.getElementById('flashcard-container').classList.remove('hidden');
+            document.getElementById('flashcard-success-box').classList.add('hidden');
+
+            const item = vocabularyData.find(v => v.word === undoneCards[currentFlashcardIndex % undoneCards.length].word);
+
+            document.getElementById('f-word').innerText = item.word;
+            document.getElementById('f-ipa').innerText = item.ipa;
+            document.getElementById('f-example').innerText = item.ex;
+            document.getElementById('f-vi').innerText = item.vi;
+
+            document.getElementById('flashcard-inner').classList.remove('card-flipped');
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard-inner').classList.toggle('card-flipped');
+        }
+
+        function handleAnkiAction(type) {
+            const undoneCards = flashcardStates.filter(c => !c.done);
+            if (undoneCards.length === 0) return;
+
+            const currentWord = undoneCards[currentFlashcardIndex % undoneCards.length].word;
+
+            if (type === 'good' || type === 'easy') {
+                const target = flashcardStates.find(c => c.word === currentWord);
+                if (target) target.done = true;
+            } else {
+                currentFlashcardIndex++;
+            }
+
+            updateFlashcardUI();
+        }
+
+        function resetProgress() {
+            flashcardStates.forEach(c => c.done = false);
+            currentFlashcardIndex = 0;
+            updateFlashcardUI();
+        }
+
+        function speakWord(e) {
+            if (e) e.stopPropagation();
+            const text = document.getElementById('f-word').innerText;
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function unlockAndGoToGapfill() {
+            gapfillUnlocked = true;
+            document.getElementById('btn-gapfill').classList.remove('disabled-tab');
+            switchTab('gapfill');
+        }
+
+        /* --- TASK 2: GAP FILL EXERCISE --- */
+        function renderGapFillQuestions() {
+            const container = document.getElementById('gapfill-questions-container');
+            container.innerHTML = gapFillData.map((q, idx) => {
+                const parts = q.sentence.split('________');
+                return `
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">Question ${idx + 1}</span>
+                            <span class="text-xs font-bold text-amber-600">Gợi ý: ${q.hint}</span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-800 leading-relaxed">
+                            ${parts[0]}
+                            <input type="text" id="gap-input-${q.id}" autocomplete="off" class="mx-1 px-3 py-1 bg-white border-2 border-indigo-300 rounded-lg text-indigo-900 font-bold text-sm focus:outline-none focus:border-indigo-600 inline-block w-40 text-center" placeholder="type word..." />
+                            ${parts[1]}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkGapFillAnswers() {
+            let correctCount = 0;
+            gapFillData.forEach(q => {
+                const inputEl = document.getElementById(`gap-input-${q.id}`);
+                const userVal = inputEl.value.trim().toLowerCase();
+                const targetVal = q.answer.toLowerCase();
+
+                if (userVal === targetVal) {
+                    correctCount++;
+                    inputEl.classList.remove('border-indigo-300', 'border-rose-500', 'bg-rose-50');
+                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                } else {
+                    inputEl.classList.remove('border-indigo-300', 'border-emerald-500', 'bg-emerald-50');
+                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                }
+            });
+
+            const feedbackEl = document.getElementById('gapfill-feedback');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-amber-100', 'text-amber-800');
+
+            if (correctCount === gapFillData.length) {
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedbackEl.innerText = `🎉 Perfect! You got ${correctCount}/${gapFillData.length} correct!`;
+                
+                setTimeout(() => {
+                    document.getElementById('gapfill-success-box').classList.remove('hidden');
+                    arrangeUnlocked = true;
+                    document.getElementById('btn-arrange').classList.remove('disabled-tab');
+                }, 800);
+            } else {
+                feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+                feedbackEl.innerText = `You got ${correctCount}/${gapFillData.length} correct. Check red inputs and try again!`;
+            }
+        }
+
+        function unlockAndGoToArrange() {
+            arrangeUnlocked = true;
+            document.getElementById('btn-arrange').classList.remove('disabled-tab');
+            switchTab('arrange');
+        }
+
+        /* --- TASK 3: UNSCRAMBLE GAME MECHANICS --- */
+        function initArrangeSentenceGame() {
+            if (arrangeCurrentIndex >= gameSentencesPool.length) {
+                document.getElementById('arrange-workspace').classList.add('hidden');
+                document.getElementById('arrange-success-box').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('arrange-workspace').classList.remove('hidden');
+            document.getElementById('arrange-success-box').classList.add('hidden');
+
+            document.getElementById('arr-current-num').innerText = arrangeCurrentIndex + 1;
+            document.getElementById('arr-score-text').innerText = arrangeScore;
+
+            const currentObj = gameSentencesPool[arrangeCurrentIndex];
+            document.getElementById('arr-vi-hint').innerText = currentObj.vi;
+
+            document.getElementById('sentence-drop-zone').innerHTML = '';
+            document.getElementById('arrange-feedback').classList.add('hidden');
+            document.getElementById('arr-check-btn').classList.remove('hidden');
+            document.getElementById('arr-next-btn').classList.add('hidden');
+
+            const tokens = currentObj.target.trim().split(/\s+/);
+            const shuffled = shuffleArray(tokens.map((word, idx) => ({ id: `tile-${idx}-${Date.now()}`, word })));
+
+            setupFloatingTiles(shuffled);
+        }
+
+        function setupFloatingTiles(tokenObjs) {
+            const arena = document.getElementById('word-bank-arena');
+            arena.innerHTML = '';
+            animatedObjects = [];
+
+            const arenaWidth = arena.clientWidth || 600;
+            const arenaHeight = arena.clientHeight || 220;
+
+            tokenObjs.forEach((item, index) => {
+                const el = document.createElement('div');
+                const colorStyle = pastelColors[index % pastelColors.length];
+                
+                el.className = `floating-tile border-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-black shadow-sm transition-transform ${colorStyle}`;
+                el.innerText = item.word;
+                el.dataset.word = item.word;
+                el.id = item.id;
+                
+                el.draggable = true;
+                el.ondragstart = (e) => handleTileDragStart(e, item.id, item.word);
+                el.onclick = () => moveTileToDropZone(el);
+
+                arena.appendChild(el);
+
+                const tileWidth = 90;
+                const tileHeight = 40;
+                const posX = Math.random() * Math.max(10, arenaWidth - tileWidth);
+                const posY = Math.random() * Math.max(10, arenaHeight - tileHeight);
+                
+                let vx = (Math.random() - 0.5) * 0.8;
+                let vy = (Math.random() - 0.5) * 0.8;
+                if (Math.abs(vx) < 0.2) vx = 0.3;
+                if (Math.abs(vy) < 0.2) vy = 0.3;
+
+                el.style.left = `${posX}px`;
+                el.style.top = `${posY}px`;
+
+                animatedObjects.push({
+                    el,
+                    x: posX,
+                    y: posY,
+                    vx,
+                    vy,
+                    width: tileWidth,
+                    height: tileHeight,
+                    isDragging: false
+                });
+
+                attachTouchAndMouseDrag(el, animatedObjects[animatedObjects.length - 1]);
+            });
+
+            startFloatingAnimationLoop();
+        }
+
+        function startFloatingAnimationLoop() {
+            stopFloatingAnimationLoop();
+
+            function animate() {
+                const arena = document.getElementById('word-bank-arena');
+                if (!arena) return;
+
+                const arenaWidth = arena.clientWidth || 600;
+                const arenaHeight = arena.clientHeight || 220;
+
+                animatedObjects.forEach(obj => {
+                    if (obj.isDragging) return;
+
+                    obj.x += obj.vx;
+                    obj.y += obj.vy;
+
+                    if (obj.x <= 0) { obj.x = 0; obj.vx *= -1; }
+                    if (obj.x >= arenaWidth - 80) { obj.x = arenaWidth - 80; obj.vx *= -1; }
+                    if (obj.y <= 0) { obj.y = 0; obj.vy *= -1; }
+                    if (obj.y >= arenaHeight - 38) { obj.y = arenaHeight - 38; obj.vy *= -1; }
+
+                    obj.el.style.left = `${obj.x}px`;
+                    obj.el.style.top = `${obj.y}px`;
+                });
+
+                animationFrameId = requestAnimationFrame(animate);
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function stopFloatingAnimationLoop() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
+
+        function attachTouchAndMouseDrag(element, animObj) {
+            let startX = 0, startY = 0;
+
+            element.addEventListener('pointerdown', (e) => {
+                if (e.button !== 0 && e.pointerType === 'mouse') return;
+                animObj.isDragging = true;
+                startX = e.clientX - animObj.x;
+                startY = e.clientY - animObj.y;
+                element.setPointerCapture(e.pointerId);
+            });
+
+            element.addEventListener('pointermove', (e) => {
+                if (!animObj.isDragging) return;
+                const arena = document.getElementById('word-bank-arena');
+                const arenaRect = arena.getBoundingClientRect();
+
+                let newX = e.clientX - arenaRect.left - 30;
+                let newY = e.clientY - arenaRect.top - 15;
+
+                animObj.x = newX;
+                animObj.y = newY;
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+            });
+
+            element.addEventListener('pointerup', (e) => {
+                if (!animObj.isDragging) return;
+                animObj.isDragging = false;
+
+                const dropZone = document.getElementById('sentence-drop-zone');
+                const dropRect = dropZone.getBoundingClientRect();
+
+                if (e.clientY >= dropRect.top && e.clientY <= dropRect.bottom &&
+                    e.clientX >= dropRect.left && e.clientX <= dropRect.right) {
+                    moveTileToDropZone(element);
+                }
+            });
+        }
+
+        function moveTileToDropZone(tileEl) {
+            const dropZone = document.getElementById('sentence-drop-zone');
+            
+            animatedObjects = animatedObjects.filter(obj => obj.el !== tileEl);
+
+            tileEl.style.position = 'static';
+            tileEl.style.left = 'auto';
+            tileEl.style.top = 'auto';
+            tileEl.classList.remove('floating-tile');
+            tileEl.classList.add('cursor-pointer', 'transform', 'hover:scale-105');
+
+            tileEl.onclick = () => returnTileToArena(tileEl);
+
+            dropZone.appendChild(tileEl);
+        }
+
+        function returnTileToArena(tileEl) {
+            const arena = document.getElementById('word-bank-arena');
+            
+            tileEl.remove();
+
+            const arenaWidth = arena.clientWidth || 600;
+            const arenaHeight = arena.clientHeight || 220;
+
+            const posX = Math.random() * (arenaWidth - 90);
+            const posY = Math.random() * (arenaHeight - 40);
+
+            tileEl.style.position = 'absolute';
+            tileEl.style.left = `${posX}px`;
+            tileEl.style.top = `${posY}px`;
+            tileEl.classList.add('floating-tile');
+
+            arena.appendChild(tileEl);
+
+            const animObj = {
+                el: tileEl,
+                x: posX,
+                y: posY,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                width: 90,
+                height: 40,
+                isDragging: false
+            };
+
+            tileEl.onclick = () => moveTileToDropZone(tileEl);
+            attachTouchAndMouseDrag(tileEl, animObj);
+
+            animatedObjects.push(animObj);
+        }
+
+        function handleTileDragStart(e, id, word) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ id, word }));
+        }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function handleDragEnter(e) { e.currentTarget.classList.add('drop-zone-active'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drop-zone-active'); }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drop-zone-active');
+            const dataStr = e.dataTransfer.getData('text/plain');
+            if (!dataStr) return;
+
+            const data = JSON.parse(dataStr);
+            const tileEl = document.getElementById(data.id);
+            if (tileEl && tileEl.parentElement.id === 'word-bank-arena') {
+                moveTileToDropZone(tileEl);
+            }
+        }
+
+        function checkArrangedSentence() {
+            const dropZone = document.getElementById('sentence-drop-zone');
+            const constructedSentence = Array.from(dropZone.children)
+                .map(child => child.dataset.word)
+                .join(' ')
+                .trim();
+
+            const targetSentence = gameSentencesPool[arrangeCurrentIndex].target.trim();
+            const feedbackEl = document.getElementById('arrange-feedback');
+
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-300', 'bg-rose-100', 'text-rose-800', 'border-rose-300');
+
+            if (constructedSentence === targetSentence) {
+                arrangeScore += 10;
+                document.getElementById('arr-score-text').innerText = arrangeScore;
+
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
+                feedbackEl.innerText = "✨ Perfect Match! Excellent grammar structure! ✨";
+
+                document.getElementById('arr-check-btn').classList.add('hidden');
+                document.getElementById('arr-next-btn').classList.remove('hidden');
+            } else {
+                feedbackEl.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-300');
+                feedbackEl.innerText = "❌ Not quite right. Tap tiles to adjust their order and try again!";
+            }
+        }
+
+        function nextArrangeQuestion() {
+            arrangeCurrentIndex++;
+            initArrangeSentenceGame();
+        }
+
+        function resetCurrentSentenceGame() {
+            initArrangeSentenceGame();
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function restartEntireSession() {
+            resetProgress();
+            arrangeCurrentIndex = 0;
+            arrangeScore = 0;
+            switchTab('reference');
+        }
+    </script>
+</body>
+</html>
