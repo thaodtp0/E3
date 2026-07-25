@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3_Lesson 2</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <style>
+        *, body, html, button, span, h1, h2, h3, p, div, input, select, textarea { 
+            font-family: 'Quicksand', sans-serif; 
+            font-weight: 600;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .perspective { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .card-inner { transition: transform 0.5s; transform-style: preserve-3d; }
+        .card-flipped { transform: rotateY(180deg); }
+        .disabled-tab { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; }
+    </style>
+</head>
+<body class="bg-[#f7f9fc] text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200 pb-12">
+
+    <!-- CLASSROOM HEADER -->
+    <header class="bg-gradient-to-r from-[#FFDEE9] via-[#FFE5E5] to-[#B5FFFC] border-b-4 border-dashed border-amber-200 shadow-sm p-6 text-center rounded-b-3xl">
+        <h1 class="text-3xl md:text-4xl font-black tracking-wide drop-shadow-sm text-indigo-900">✨ E3_Lesson 2 ✨</h1>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-4xl w-full mx-auto px-4 mt-6">
+        <div class="flex bg-amber-100/70 p-1.5 rounded-2xl border border-amber-200 shadow-inner overflow-x-auto">
+            <button onclick="switchTab('reference')" id="btn-reference" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center bg-white text-amber-600 shadow-sm transition cursor-pointer whitespace-nowrap">📚 Word Bank</button>
+            <button onclick="switchTab('flashcard')" id="btn-flashcard" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition cursor-pointer whitespace-nowrap">🎴 Flashcards</button>
+            <button onclick="switchTab('sentence')" id="btn-sentence" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">✍️ Sentence Building</button>
+            <button onclick="switchTab('writing')" id="btn-writing" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🏠 My Neighborhood</button>
+        </div>
+    </div>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        
+        <!-- SECTION 0: VOCABULARY REFERENCE TABLE -->
+        <section id="tab-reference" class="tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div>
+                    <h2 class="text-2xl font-black text-indigo-900 font-heading">📖 E3_Lesson 2 Vocabulary List</h2>
+                    <p class="text-sm text-slate-500 mt-1">Review places, amenities, verb phrases, and adverbs of degree before practicing.</p>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead>
+                            <tr class="bg-indigo-50 border-b border-slate-200 text-indigo-900 text-xs uppercase tracking-wider font-black">
+                                <th class="p-3.5">Vocabulary</th>
+                                <th class="p-3.5">Meaning (Tiếng Việt)</th>
+                                <th class="p-3.5">IPA</th>
+                                <th class="p-3.5">Example Sentence (A2)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reference-table-body" class="divide-y divide-slate-100 text-xs md:text-sm">
+                            <!-- Dynamic Content Inserted Here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="switchTab('flashcard')" class="px-8 py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl text-sm shadow-sm transition cursor-pointer">Start Flashcards ➔</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TASK 1: FLASHCARDS -->
+        <section id="tab-flashcard" class="tab-content hidden space-y-6">
+            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-amber-300 shadow-sm flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-black text-slate-600">Progress: <span id="progress-text" class="text-amber-500">0/0</span></div>
+                <div class="w-full sm:w-1/3 bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <button onclick="resetProgress()" class="text-xs text-rose-500 hover:underline font-black cursor-pointer">🔄 Reset Progress</button>
+            </div>
+            
+            <div id="flashcard-container">
+                <div id="card-arena" class="perspective w-full max-w-md mx-auto h-[420px] cursor-pointer">
+                    <div id="flashcard-inner" onclick="flipCard()" class="card-inner w-full h-full relative border-4 border-amber-400 rounded-3xl shadow-md bg-white">
+                        <!-- Front View -->
+                        <div class="backface-hidden absolute inset-0 p-6 flex flex-col justify-between items-center text-center bg-amber-50/30 rounded-[20px]">
+                            <span class="text-xs font-black text-amber-600 uppercase tracking-widest bg-amber-100 px-4 py-1.5 rounded-full">English Word</span>
+                            <div class="space-y-4 my-auto w-full">
+                                <h2 id="f-word" class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight"></h2>
+                                <div class="flex justify-center items-center space-x-2">
+                                    <span id="f-ipa" class="text-indigo-600 font-bold text-base md:text-lg"></span>
+                                    <button onclick="speakWord(event)" class="w-10 h-10 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full transition flex items-center justify-center text-lg cursor-pointer shadow-sm">🔊</button>
+                                </div>
+                                <p id="f-example" class="text-slate-700 text-sm md:text-base border-t-2 border-dashed border-amber-200 pt-4 px-2 leading-relaxed font-medium bg-white rounded-xl p-3 shadow-sm"></p>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold">👉 Tap card to flip! 👈</p>
+                        </div>
+                        <!-- Back View -->
+                        <div class="backface-hidden w-full h-full absolute inset-0 p-6 flex flex-col justify-between bg-slate-900 text-white rounded-[22px]" style="transform: rotateY(180deg);">
+                            <span class="text-xs font-black text-amber-400 uppercase tracking-widest bg-slate-800 px-4 py-1.5 rounded-full w-max mx-auto">Vietnamese Meaning</span>
+                            <div class="my-auto space-y-5 text-center">
+                                <div>
+                                    <span class="text-xs uppercase font-black text-slate-400 block mb-1 tracking-wider">Meaning:</span>
+                                    <h3 id="f-vi" class="text-2xl md:text-3xl font-black text-amber-300"></h3>
+                                </div>
+                            </div>
+                            <p class="text-xs text-center text-slate-500 font-bold">Tap again to flip back</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Anki Controls -->
+                <div id="anki-controls" class="w-full max-w-md mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-4 gap-2 mt-6">
+                    <button onclick="handleAnkiAction('again')" class="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-rose-600">Again</span><span class="text-[10px] text-rose-400 font-bold block mt-0.5">&lt;1m</span></button>
+                    <button onclick="handleAnkiAction('hard')" class="p-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-amber-600">Hard</span><span class="text-[10px] text-amber-400 font-bold block mt-0.5">&lt;10m</span></button>
+                    <button onclick="handleAnkiAction('good')" class="p-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-center transition cursor-pointer"><span class="block text-xs font-black text-indigo-600">Good</span><span class="text-[10px] text-indigo-400 font-bold block mt-0.5">1d</span></button>
+                    <button onclick="handleAnkiAction('easy')" class="p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-center transition shadow-sm cursor-pointer"><span class="block text-xs font-black text-emerald-600">Easy</span><span class="text-[10px] text-emerald-400 font-bold block mt-0.5">4d</span></button>
+                </div>
+            </div>
+
+            <!-- Flashcard Completion Screen -->
+            <div id="flashcard-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎈🏢🏨</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Flashcards Mastered!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">Great job reviewing all vocabulary! Let's build sentences using word prompts.</p>
+                <button onclick="unlockAndGoToSentence()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start Sentence Building ➔</button>
+            </div>
+        </section>
+
+        <!-- TASK 2: SENTENCE BUILDING (DYNAMIC FEEDBACK SYSTEM) -->
+        <section id="tab-sentence" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-indigo-100 text-indigo-700 font-black px-4 py-1.5 rounded-full tracking-wide">Task 2: Sentence Building</span>
+                    <h3 class="text-2xl font-heading font-black text-slate-900">Build Correct Sentences ✍️</h3>
+                    <p class="text-sm text-slate-500 font-medium max-w-xl mx-auto">Use the given prompt words to write correct sentences. Pay attention to verb tenses, prepositions, and adjective order!</p>
+                </div>
+
+                <div id="sentence-prompts-container" class="space-y-6">
+                    <!-- Dynamic Sentence Prompts -->
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="checkSentenceAnswers()" class="px-10 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl shadow-md transition cursor-pointer">Check Sentences</button>
+                </div>
+
+                <div id="sentence-feedback" class="p-4 rounded-2xl text-center font-black hidden"></div>
+            </div>
+
+            <div id="sentence-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎯📝✨</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Great Sentence Building!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">You have mastered writing accurate place descriptions! Now, try writing about your own area.</p>
+                <button onclick="unlockAndGoToWriting()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Write About Your Area ➔</button>
+            </div>
+        </section>
+
+        <!-- TASK 3: MY NEIGHBORHOOD WRITING (SENTENCE CASE TITLE) -->
+        <section id="tab-writing" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-amber-100 text-amber-700 font-black px-4 py-1.5 rounded-full tracking-wide">Task 3: Personal Writing</span>
+                    <h3 class="text-2xl font-heading font-black text-slate-900">Describe where you live 🏠</h3>
+                    <p class="text-sm text-slate-500 font-medium max-w-xl mx-auto">Write 5 sentences about your living place using the vocabulary and grammar learned in Lesson 2.</p>
+                </div>
+
+                <!-- EXAMPLES FOR STUDENTS -->
+                <div class="bg-amber-50/70 border-2 border-dashed border-amber-300 p-4 rounded-2xl space-y-2">
+                    <h4 class="text-xs uppercase font-black text-amber-800 tracking-wider">💡 Examples / Câu mẫu tham khảo:</h4>
+                    <ul class="text-xs md:text-sm text-slate-700 font-medium space-y-1 list-disc list-inside">
+                        <li><strong>Example 1:</strong> I live in a modern apartment near Hanoi city centre.</li>
+                        <li><strong>Example 2:</strong> My neighborhood is very peaceful with many green trees.</li>
+                    </ul>
+                </div>
+
+                <!-- 5 WRITING INPUT LINES -->
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 text-xs font-black rounded-full flex items-center justify-center shrink-0">1</span>
+                        <input type="text" id="write-1" placeholder="Sentence 1: Where do you live? (e.g., I live in...)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 text-xs font-black rounded-full flex items-center justify-center shrink-0">2</span>
+                        <input type="text" id="write-2" placeholder="Sentence 2: How is your neighborhood? (e.g., It is very...)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 text-xs font-black rounded-full flex items-center justify-center shrink-0">3</span>
+                        <input type="text" id="write-3" placeholder="Sentence 3: How do you travel? / Where do you work/study?" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 text-xs font-black rounded-full flex items-center justify-center shrink-0">4</span>
+                        <input type="text" id="write-4" placeholder="Sentence 4: Facilities/amenities near your house (hotel, gym, pool...)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 text-xs font-black rounded-full flex items-center justify-center shrink-0">5</span>
+                        <input type="text" id="write-5" placeholder="Sentence 5: What are you doing these days / past action?" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="submitWriting()" class="px-10 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-xl shadow-md transition cursor-pointer">Submit Writing 🚀</button>
+                </div>
+
+                <div id="writing-feedback" class="p-4 rounded-2xl text-center font-black hidden"></div>
+
+                <!-- SUGGESTED MODEL ANSWERS DISPLAYED AFTER SUBMISSION -->
+                <div id="suggested-models" class="hidden bg-indigo-50/80 border-2 border-indigo-200 p-6 rounded-3xl space-y-4">
+                    <h4 class="text-base font-black text-indigo-900 flex items-center space-x-2">
+                        <span>🌟 Suggested Sentences for Learning (Gợi ý tham khảo):</span>
+                    </h4>
+                    <p class="text-xs text-slate-600">Dưới đây là một số câu ví dụ hay kết hợp từ vựng & ngữ pháp Lesson 2 bạn có thể học thuộc:</p>
+                    <ul class="space-y-2 text-xs md:text-sm text-slate-800 font-medium">
+                        <li class="bg-white p-3 rounded-xl border border-indigo-100">1. I <strong>live in</strong> a <strong>fairly peaceful</strong> neighborhood near Hanoi.</li>
+                        <li class="bg-white p-3 rounded-xl border border-indigo-100">2. My street is <strong>extremely busy</strong> during the day but <strong>quiet</strong> at night.</li>
+                        <li class="bg-white p-3 rounded-xl border border-indigo-100">3. I usually <strong>travel by bus</strong> to my university every morning.</li>
+                        <li class="bg-white p-3 rounded-xl border border-indigo-100">4. Our <strong>apartment</strong> building has a <strong>modern gym</strong> and a clean <strong>swimming pool</strong>.</li>
+                        <li class="bg-white p-3 rounded-xl border border-indigo-100">5. Right now, my family <strong>is looking for</strong> a new <strong>guest house</strong> for our summer trip.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // MASTER VOCABULARY LIST (E3_Lesson 2)
+        const vocabularyData = [
+            { word: "busy", ipa: "/ˈbɪzi/", vi: "nhộn nhịp, bận rộn", ex: "My neighborhood is busy during the day." },
+            { word: "clean", ipa: "/kliːn/", vi: "sạch sẽ", ex: "The streets are clean and tidy." },
+            { word: "crowded", ipa: "/ˈkraʊdɪd/", vi: "đông đúc", ex: "The city centre is always crowded." },
+            { word: "dangerous", ipa: "/ˈdeɪndʒərəs/", vi: "nguy hiểm", ex: "It is dangerous to walk here at night." },
+            { word: "friendly", ipa: "/ˈfrendli/", vi: "thân thiện", ex: "The people in my area are very friendly." },
+            { word: "green", ipa: "/ɡriːn/", vi: "nhiều cây xanh", ex: "My neighborhood is green with many parks." },
+            { word: "lively", ipa: "/ˈlaɪvli/", vi: "sôi động", ex: "This is a lively area with many cafés." },
+            { word: "modern", ipa: "/ˈmɒdn/", vi: "hiện đại", ex: "We live in a modern apartment building." },
+            { word: "noisy", ipa: "/ˈnɔɪzi/", vi: "ồn ào", ex: "My street is noisy because of the traffic." },
+            { word: "peaceful", ipa: "/ˈpiːsfl/", vi: "yên bình", ex: "The village is quiet and peaceful." },
+            { word: "safe", ipa: "/seɪf/", vi: "an toàn", ex: "It is a safe place to live." },
+            { word: "live in", ipa: "/lɪv ɪn/", vi: "sống ở", ex: "I live in a small town near Hanoi." },
+            { word: "move to", ipa: "/muːv tuː/", vi: "chuyển đến", ex: "My family wants to move to a bigger city." },
+            { word: "travel by", ipa: "/ˈtrævl baɪ/", vi: "đi bằng (phương tiện)", ex: "I travel by bus to school every day." },
+            { word: "work in", ipa: "/wɜːk ɪn/", vi: "làm việc ở", ex: "My mother works in the city centre." },
+            { word: "belong to", ipa: "/bɪˈlɒŋ tuː/", vi: "thuộc về", ex: "This apartment belongs to my uncle." },
+            { word: "look for", ipa: "/lʊk fɔː(r)/", vi: "tìm kiếm", ex: "We are looking for a new apartment." },
+            { word: "pay for", ipa: "/peɪ fɔː(r)/", vi: "trả tiền cho", ex: "We paid for the hotel online." },
+            { word: "wait for", ipa: "/weɪt fɔː(r)/", vi: "chờ đợi", ex: "I am waiting for the bus near my house." },
+            { word: "apartment", ipa: "/əˈpɑːtmənt/", vi: "căn hộ", ex: "They live in a small apartment." },
+            { word: "resort", ipa: "/rɪˈzɔːt/", vi: "khu nghỉ dưỡng", ex: "We stayed at a beach resort last summer." },
+            { word: "campsite", ipa: "/ˈkæmpsaɪt/", vi: "khu cắm trại", ex: "The campsite is near a beautiful lake." },
+            { word: "hostel", ipa: "/ˈhɒstl/", vi: "nhà nghỉ giá rẻ", ex: "We stayed in a hostel during our trip." },
+            { word: "hotel", ipa: "/həʊˈtel/", vi: "khách sạn", ex: "The hotel has a nice swimming pool." },
+            { word: "guest house", ipa: "/ˈɡest haʊs/", vi: "nhà khách, nhà nghỉ", ex: "We booked a guest house in the countryside." },
+            { word: "room service", ipa: "/ˈruːm ˌsɜːvɪs/", vi: "dịch vụ phòng", ex: "The hotel offers room service all day." },
+            { word: "gym", ipa: "/dʒɪm/", vi: "phòng tập gym", ex: "Our apartment building has a small gym." },
+            { word: "pool", ipa: "/puːl/", vi: "hồ bơi", ex: "The children are swimming in the pool." },
+            { word: "spa", ipa: "/spɑː/", vi: "khu spa", ex: "My parents relaxed at the spa." },
+            { word: "very", ipa: "/ˈveri/", vi: "rất", ex: "My neighborhood is very quiet." },
+            { word: "really", ipa: "/ˈrɪəli/", vi: "thực sự, rất", ex: "The park is really beautiful." },
+            { word: "extremely", ipa: "/ɪkˈstriːmli/", vi: "cực kỳ", ex: "The streets are extremely crowded on weekends." },
+            { word: "completely", ipa: "/kəmˈpliːtli/", vi: "hoàn toàn", ex: "The hotel is completely full today." },
+            { word: "fairly", ipa: "/ˈfeəli/", vi: "khá", ex: "My area is fairly peaceful." },
+            { word: "almost", ipa: "/ˈɔːlməʊst/", vi: "gần như", ex: "The park is almost empty in the morning." }
+        ];
+
+        // TASK 2: Comprehensive Targets (Including Shortforms like 're, 'm, 's, and optional articles)
+        const sentencePrompts = [
+            {
+                id: 1,
+                prompt: "My neighborhood / clean / and / quiet",
+                targets: ["my neighborhood is clean and quiet"],
+                hint: "Sử dụng động từ 'to be' (is) cho chủ ngữ số ít."
+            },
+            {
+                id: 2,
+                prompt: "Right now / I / wait for / bus / near my house",
+                targets: [
+                    "right now i am waiting for the bus near my house",
+                    "right now i'm waiting for the bus near my house",
+                    "i am waiting for the bus near my house right now",
+                    "i'm waiting for the bus near my house right now"
+                ],
+                hint: "Sử dụng thì Present Continuous (am waiting for / i'm waiting for) + mạo từ 'the'."
+            },
+            {
+                id: 3,
+                prompt: "This modern apartment / belong to / my uncle",
+                targets: ["this modern apartment belongs to my uncle"],
+                hint: "Đứng trước danh từ là tính từ (modern apartment), chia động từ số ít 'belongs to'."
+            },
+            {
+                id: 4,
+                prompt: "Last summer / we / stay / beautiful beach resort",
+                targets: [
+                    "last summer we stayed at a beautiful beach resort",
+                    "we stayed at a beautiful beach resort last summer"
+                ],
+                hint: "Sử dụng thì Past Simple (stayed at) và tính từ đứng trước danh từ (a beautiful beach resort)."
+            },
+            {
+                id: 5,
+                prompt: "They / look for / cheap hostel / in city centre",
+                targets: [
+                    "they are looking for a cheap hostel in the city centre",
+                    "they're looking for a cheap hostel in the city centre",
+                    "they are looking for a cheap hostel in city centre",
+                    "they're looking for a cheap hostel in city centre",
+                    "they look for a cheap hostel in the city centre",
+                    "they look for a cheap hostel in city centre"
+                ],
+                hint: "Chú ý cấu trúc 'look for' / 'are looking for' / 'they're looking for' và 'a cheap hostel'."
+            },
+            {
+                id: 6,
+                prompt: "I / usually / travel by / bus / to work",
+                targets: ["i usually travel by bus to work"],
+                hint: "Dùng cụm 'travel by' + phương tiện và trạng từ chỉ tần suất 'usually' đứng trước động từ."
+            },
+            {
+                id: 7,
+                prompt: "My family / live in / small green village",
+                targets: [
+                    "my family lives in a small green village",
+                    "my family live in a small green village"
+                ],
+                hint: "Dùng cụm 'live in' + tính từ đứng trước danh từ (a small green village)."
+            },
+            {
+                id: 8,
+                prompt: "The city centre / extremely / crowded / at weekends",
+                targets: [
+                    "the city centre is extremely crowded at weekends",
+                    "the city centre is extremely crowded on weekends"
+                ],
+                hint: "Sử dụng động từ 'is' và trạng từ 'extremely' đứng trước tính từ 'crowded'."
+            },
+            {
+                id: 9,
+                prompt: "We / pay for / room service / yesterday",
+                targets: [
+                    "we paid for room service yesterday",
+                    "we paid for the room service yesterday"
+                ],
+                hint: "Hành động xảy ra 'yesterday' cần chia thì Past Simple của 'pay for' thành 'paid for'."
+            },
+            {
+                id: 10,
+                prompt: "Our hotel / have / very large swimming pool",
+                targets: ["our hotel has a very large swimming pool"],
+                hint: "Chia động từ 'has' cho chủ ngữ số ít và dùng mạo từ 'a' trước 'very large swimming pool'."
+            }
+        ];
+
+        // UNLOCK STATES
+        let sentenceUnlocked = false;
+        let writingUnlocked = false;
+
+        let flashcardStates = vocabularyData.map(v => ({ word: v.word, done: false }));
+        let currentFlashcardIndex = 0;
+
+        window.onload = function() {
+            renderReferenceTable();
+            renderSentencePrompts();
+            updateFlashcardUI();
+        };
+
+        function renderReferenceTable() {
+            const tbody = document.getElementById('reference-table-body');
+            tbody.innerHTML = vocabularyData.map(v => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3.5 font-black text-indigo-950">${v.word}</td>
+                    <td class="p-3.5 font-bold text-slate-700">${v.vi}</td>
+                    <td class="p-3.5 text-indigo-600 font-bold">${v.ipa}</td>
+                    <td class="p-3.5 text-slate-600">${v.ex}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tabId) {
+            if (tabId === 'sentence' && !sentenceUnlocked) return;
+            if (tabId === 'writing' && !writingUnlocked) return;
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-amber-600', 'shadow-sm');
+                el.classList.add('text-slate-500');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('bg-white', 'text-amber-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500');
+        }
+
+        /* --- FLASHCARD SYSTEM --- */
+        function updateFlashcardUI() {
+            const undoneCards = flashcardStates.filter(c => !c.done);
+            const total = flashcardStates.length;
+            const completed = total - undoneCards.length;
+            
+            document.getElementById('progress-text').innerText = `${completed}/${total}`;
+            document.getElementById('progress-bar').style.width = `${(completed / total) * 100}%`;
+
+            if (undoneCards.length === 0) {
+                document.getElementById('flashcard-container').classList.add('hidden');
+                document.getElementById('flashcard-success-box').classList.remove('hidden');
+                sentenceUnlocked = true;
+                document.getElementById('btn-sentence').classList.remove('disabled-tab');
+                return;
+            }
+
+            document.getElementById('flashcard-container').classList.remove('hidden');
+            document.getElementById('flashcard-success-box').classList.add('hidden');
+
+            const item = vocabularyData.find(v => v.word === undoneCards[currentFlashcardIndex % undoneCards.length].word);
+
+            document.getElementById('f-word').innerText = item.word;
+            document.getElementById('f-ipa').innerText = item.ipa;
+            document.getElementById('f-example').innerText = item.ex;
+            document.getElementById('f-vi').innerText = item.vi;
+
+            document.getElementById('flashcard-inner').classList.remove('card-flipped');
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard-inner').classList.toggle('card-flipped');
+        }
+
+        function handleAnkiAction(type) {
+            const undoneCards = flashcardStates.filter(c => !c.done);
+            if (undoneCards.length === 0) return;
+
+            const currentWord = undoneCards[currentFlashcardIndex % undoneCards.length].word;
+
+            if (type === 'good' || type === 'easy') {
+                const target = flashcardStates.find(c => c.word === currentWord);
+                if (target) target.done = true;
+            } else {
+                currentFlashcardIndex++;
+            }
+
+            updateFlashcardUI();
+        }
+
+        function resetProgress() {
+            flashcardStates.forEach(c => c.done = false);
+            currentFlashcardIndex = 0;
+            updateFlashcardUI();
+        }
+
+        function speakWord(e) {
+            if (e) e.stopPropagation();
+            const text = document.getElementById('f-word').innerText;
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function unlockAndGoToSentence() {
+            sentenceUnlocked = true;
+            document.getElementById('btn-sentence').classList.remove('disabled-tab');
+            switchTab('sentence');
+        }
+
+        /* --- TASK 2: SENTENCE BUILDING WITH DYNAMIC REAL-TIME FEEDBACK --- */
+        function renderSentencePrompts() {
+            const container = document.getElementById('sentence-prompts-container');
+            container.innerHTML = sentencePrompts.map((p, idx) => `
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3" id="sentence-card-${p.id}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">Sentence ${idx + 1}</span>
+                        <span class="text-xs font-bold text-amber-700 italic">💡 ${p.hint}</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 text-sm font-black text-indigo-950 tracking-wide">
+                        Prompt: <span class="text-amber-600">${p.prompt}</span>
+                    </div>
+                    <input type="text" id="sentence-input-${p.id}" placeholder="Type full sentence here..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 font-medium transition">
+                    <div id="sentence-err-${p.id}" class="text-xs font-bold text-rose-600 hidden mt-1"></div>
+                </div>
+            `).join('');
+        }
+
+        // Standardize text for checking (strip trailing punctuation, normalize apostrophes)
+        function cleanText(str) {
+            return str
+                .toLowerCase()
+                .replace(/[’'`]/g, "'")
+                .replace(/[^a-z0-9' ]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // Levenshtein Distance Algorithm for Spelling Error Detection
+        function getLevenshteinDistance(a, b) {
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+            for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        // Dynamic Error Analysis Function
+        function analyzeUserError(userRaw, targetList, generalHint) {
+            if (!userRaw || userRaw.trim() === '') {
+                return "⚠️ Bạn chưa nhập câu trả lời!";
+            }
+
+            const cleanedUser = cleanText(userRaw);
+            const userWords = cleanedUser.split(' ');
+
+            // Pick the primary reference target
+            const primaryTarget = cleanText(targetList[0]);
+            const targetWords = primaryTarget.split(' ');
+
+            // 1. Detect Spelling Mistakes (Words with distance 1 or 2)
+            for (let uWord of userWords) {
+                // Skip super short words or standard shortforms
+                if (uWord.length <= 2 || uWord === "i'm" || uWord === "they're") continue;
+                
+                let isMatch = false;
+                for (let tWord of targetWords) {
+                    if (uWord === tWord) { isMatch = true; break; }
+                }
+
+                if (!isMatch) {
+                    for (let tWord of targetWords) {
+                        if (Math.abs(uWord.length - tWord.length) <= 2) {
+                            const dist = getLevenshteinDistance(uWord, tWord);
+                            if (dist > 0 && dist <= 2) {
+                                return `⚠️ Lỗi chính tả: Bạn có thể đã gõ sai từ "${uWord}". Hãy kiểm tra lại từ này!`;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Detect Missing Words
+            for (let tWord of targetWords) {
+                let found = false;
+                for (let targetOption of targetList) {
+                    const optionWords = cleanText(targetOption).split(' ');
+                    if (userWords.some(uw => optionWords.includes(uw))) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // Key grammar words checking
+                const keyGrammarWords = ["is", "are", "am", "was", "were", "a", "an", "the", "in", "at", "on", "for", "to", "by", "has", "have", "stayed", "paid", "belongs", "lives", "waiting", "looking"];
+                if (keyGrammarWords.includes(tWord) && !userWords.includes(tWord)) {
+                    // Check contracted form equivalence
+                    if (tWord === "am" && userWords.some(w => w.includes("'m"))) continue;
+                    if (tWord === "are" && userWords.some(w => w.includes("'re"))) continue;
+                    if (tWord === "is" && userWords.some(w => w.includes("'s"))) continue;
+
+                    return `⚠️ Thiếu từ/cấu trúc quan trọng: Hãy kiểm tra xem bạn đã có từ "${tWord}" chưa?`;
+                }
+            }
+
+            // 3. Fallback to Grammar Hint if sentence structure is off
+            return `⚠️ Kiểm tra ngữ pháp / Cấu trúc câu chưa chính xác. Gợi ý: ${generalHint}`;
+        }
+
+        function checkSentenceAnswers() {
+            let correctCount = 0;
+
+            sentencePrompts.forEach(p => {
+                const inputEl = document.getElementById(`sentence-input-${p.id}`);
+                const errEl = document.getElementById(`sentence-err-${p.id}`);
+                const cardEl = document.getElementById(`sentence-card-${p.id}`);
+                
+                const userRaw = inputEl.value;
+                const cleanedUser = cleanText(userRaw);
+                const isCorrect = p.targets.some(target => cleanText(target) === cleanedUser);
+
+                if (isCorrect) {
+                    correctCount++;
+                    inputEl.classList.remove('border-rose-500', 'bg-rose-50');
+                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                    cardEl.classList.remove('border-rose-300', 'bg-rose-50/30');
+                    errEl.classList.add('hidden');
+                } else {
+                    inputEl.classList.remove('border-emerald-500', 'bg-emerald-50');
+                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                    cardEl.classList.add('border-rose-300', 'bg-rose-50/30');
+
+                    // Generate Dynamic Real-time Feedback
+                    const dynamicErrorMsg = analyzeUserError(userRaw, p.targets, p.hint);
+                    errEl.innerText = dynamicErrorMsg;
+                    errEl.classList.remove('hidden');
+                }
+            });
+
+            const feedbackEl = document.getElementById('sentence-feedback');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-amber-100', 'text-amber-800');
+
+            if (correctCount === sentencePrompts.length) {
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedbackEl.innerText = `🎉 Perfect! You correctly built all ${correctCount}/${sentencePrompts.length} sentences!`;
+
+                setTimeout(() => {
+                    document.getElementById('sentence-success-box').classList.remove('hidden');
+                    writingUnlocked = true;
+                    document.getElementById('btn-writing').classList.remove('disabled-tab');
+                }, 800);
+            } else {
+                feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+                feedbackEl.innerText = `You built ${correctCount}/${sentencePrompts.length} sentences correctly. Please check the highlighted red sentences and follow the specific hints!`;
+            }
+        }
+
+        function unlockAndGoToWriting() {
+            writingUnlocked = true;
+            document.getElementById('btn-writing').classList.remove('disabled-tab');
+            switchTab('writing');
+        }
+
+        /* --- TASK 3: PERSONAL WRITING & MODEL ANSWERS --- */
+        function submitWriting() {
+            let filledCount = 0;
+            for (let i = 1; i <= 5; i++) {
+                const val = document.getElementById(`write-${i}`).value.trim();
+                if (val.length > 3) filledCount++;
+            }
+
+            const feedbackEl = document.getElementById('writing-feedback');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            if (filledCount < 5) {
+                feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
+                feedbackEl.innerText = `Please write all 5 sentences before submitting! (${filledCount}/5 completed)`;
+                return;
+            }
+
+            feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+            feedbackEl.innerText = `🚀 Writing submitted successfully! Check out the suggested model sentences below to improve your English.`;
+
+            document.getElementById('suggested-models').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
