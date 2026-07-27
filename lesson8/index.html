@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3_Lesson 8: Music, Art & Movies</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <style>
+        *, body, html, button, span, h1, h2, h3, p, div, input, select, textarea { 
+            font-family: 'Quicksand', sans-serif; 
+            font-weight: 600;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .perspective { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .card-inner { transition: transform 0.5s; transform-style: preserve-3d; }
+        .card-flipped { transform: rotateY(180deg); }
+        .disabled-tab { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; }
+        .grid-cell { user-select: none; }
+    </style>
+</head>
+<body class="bg-[#f7f9fc] text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200 pb-12">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-[#E0E7FF] via-[#EEF2FF] to-[#E0F2FE] border-b-4 border-dashed border-indigo-200 shadow-sm p-6 text-center rounded-b-3xl">
+        <h1 class="text-3xl md:text-4xl font-black tracking-wide drop-shadow-sm text-indigo-950">🎨 E3_Lesson 8: Music, Art & Movies 🎬</h1>
+        <p class="text-xs md:text-sm text-indigo-700 font-bold mt-1">Interactive Practice for A2 Students</p>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-4xl w-full mx-auto px-4 mt-6">
+        <div class="flex bg-indigo-100/70 p-1.5 rounded-2xl border border-indigo-200 shadow-inner overflow-x-auto">
+            <button onclick="switchTab('reference')" id="btn-reference" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center bg-white text-indigo-600 shadow-sm transition cursor-pointer whitespace-nowrap">📚 Word Bank</button>
+            <button onclick="switchTab('flashcard')" id="btn-flashcard" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition cursor-pointer whitespace-nowrap">🎴 Flashcards</button>
+            <button onclick="switchTab('fill-blanks')" id="btn-fill-blanks" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">✏️ Fill in Blanks</button>
+            <button onclick="switchTab('error-correction')" id="btn-error-correction" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🛠️ Error Correction</button>
+            <button onclick="switchTab('free-writing')" id="btn-free-writing" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">💬 Personal Writing</button>
+            <button onclick="switchTab('completion')" id="btn-completion" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🎉 Completion</button>
+        </div>
+    </div>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        
+        <!-- TAB 1: WORD BANK -->
+        <section id="tab-reference" class="tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <h2 class="text-2xl font-black text-indigo-900 font-heading">📖 Vocabulary List / Danh sách từ vựng</h2>
+                    <span id="word-count-badge" class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold">Vocabulary Items</span>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-[500px]">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead class="sticky top-0 bg-indigo-50 border-b border-slate-200 text-indigo-900 text-xs uppercase tracking-wider font-black z-10">
+                            <tr>
+                                <th class="p-3.5">Vocabulary</th>
+                                <th class="p-3.5">Meaning</th>
+                                <th class="p-3.5">IPA</th>
+                                <th class="p-3.5">Example Sentence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reference-table-body" class="divide-y divide-slate-100 text-xs md:text-sm">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="switchTab('flashcard')" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm shadow-sm transition cursor-pointer">Start Flashcards Practice / Bắt đầu ôn Flashcards ➔</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: FLASHCARDS -->
+        <section id="tab-flashcard" class="tab-content hidden space-y-6">
+            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-indigo-300 shadow-sm flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-black text-slate-600">Remaining Queue / Thẻ còn lại: <span id="queue-text" class="text-indigo-600 font-extrabold">0 cards</span></div>
+                <div class="w-full sm:w-1/3 bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <button onclick="resetProgress()" class="text-xs text-rose-500 hover:underline font-black cursor-pointer">🔄 Reset Session / Làm lại</button>
+            </div>
+            
+            <div id="flashcard-container" class="space-y-6">
+                <div id="card-arena" class="perspective w-full max-w-md mx-auto h-[420px] cursor-pointer">
+                    <div id="flashcard-inner" onclick="flipCard()" class="card-inner w-full h-full relative border-4 border-indigo-400 rounded-3xl shadow-md bg-white">
+                        
+                        <!-- FRONT SIDE -->
+                        <div class="backface-hidden absolute inset-0 p-6 flex flex-col justify-between items-center text-center bg-indigo-50/40 rounded-[20px]">
+                            <span id="f-badge" class="text-xs font-black text-indigo-700 uppercase tracking-widest bg-indigo-100 px-4 py-1.5 rounded-full">Prompt</span>
+                            
+                            <div class="space-y-3 my-auto w-full">
+                                <h3 id="f-prompt" class="text-2xl md:text-3xl font-black text-indigo-950"></h3>
+                                
+                                <div id="f-extra-content" class="hidden space-y-2 pt-2 border-t border-indigo-200/60">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <span id="f-ipa" class="text-indigo-600 font-bold text-sm font-mono"></span>
+                                        <button id="f-audio-btn" onclick="speakText(currentCard.word, event)" class="w-7 h-7 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition flex items-center justify-center text-xs cursor-pointer shadow-sm">🔊</button>
+                                    </div>
+                                    <p id="f-example" class="text-slate-600 text-xs px-2 font-medium leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-indigo-600 font-black">👉 Tap card to reveal answer / Chạm để xem đáp án 👈</p>
+                        </div>
+
+                        <!-- BACK SIDE -->
+                        <div class="backface-hidden w-full h-full absolute inset-0 p-6 flex flex-col justify-between bg-slate-900 text-white rounded-[22px]" style="transform: rotateY(180deg);">
+                            <span id="b-badge" class="text-xs font-black text-indigo-400 uppercase tracking-widest bg-slate-800 px-4 py-1.5 rounded-full w-max mx-auto">Answer</span>
+                            
+                            <div class="my-auto space-y-3 text-center">
+                                <h2 id="b-answer" class="text-3xl md:text-4xl font-black text-amber-300"></h2>
+                                
+                                <div id="b-extra-content" class="space-y-2 border-t border-slate-800 pt-3">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <span id="b-ipa" class="text-indigo-300 font-bold text-sm font-mono"></span>
+                                        <button id="b-audio-btn" onclick="speakText(currentCard.word, event)" class="w-7 h-7 bg-indigo-900 hover:bg-indigo-800 text-indigo-200 rounded-full transition flex items-center justify-center text-xs cursor-pointer shadow-sm">🔊</button>
+                                    </div>
+                                    <p id="b-example" class="text-slate-300 text-xs px-2 font-medium leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-center text-slate-500 font-bold">Rate how well you recalled this / Đánh giá mức độ nhớ 👇</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Nhận xét 1: Sửa nút Hard từ 2m thành 10m -->
+                <div class="w-full max-w-md mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-4 gap-2">
+                    <button onclick="handleAnkiAction('again')" class="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-rose-600">Again</span>
+                        <span class="text-[10px] text-rose-400 font-bold block mt-0.5">&lt; 1m</span>
+                    </button>
+                    <button onclick="handleAnkiAction('hard')" class="p-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-amber-600">Hard</span>
+                        <span class="text-[10px] text-amber-400 font-bold block mt-0.5">10m</span>
+                    </button>
+                    <button onclick="handleAnkiAction('good')" class="p-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-indigo-600">Good</span>
+                        <span class="text-[10px] text-indigo-400 font-bold block mt-0.5">1d</span>
+                    </button>
+                    <button onclick="handleAnkiAction('easy')" class="p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-center transition shadow-sm cursor-pointer">
+                        <span class="block text-xs font-black text-emerald-600">Easy</span>
+                        <span class="text-[10px] text-emerald-400 font-bold block mt-0.5">4d</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="flashcard-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🌟🎭🎬</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Flashcards Completed!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">Awesome job! You have memorized key vocabulary for Lesson 8.<br><span class="text-xs text-slate-500">(Tuyệt vời! Bạn đã thuộc từ vựng của Bài 8.)</span></p>
+                <button onclick="unlockAndGoToFillBlanks()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start Task 1: Fill in Blanks / Bắt đầu Bài 1 ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 3: TASK 1 - FILL IN THE BLANKS -->
+        <section id="tab-fill-blanks" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-amber-100 text-amber-800 font-black px-4 py-1.5 rounded-full tracking-wide">Task 1: Vocabulary Fill in the Blanks</span>
+                    <p class="text-xs text-slate-600 font-bold">
+                        <b>Instructions:</b> Choose the most appropriate word from the box to complete each sentence.<br>
+                        <span class="text-indigo-600">(Chọn từ thích hợp nhất trong khung dưới đây để điền vào chỗ trống)</span>
+                    </p>
+                </div>
+
+                <!-- Word Bank Box -->
+                <div class="bg-indigo-50/70 p-4 rounded-2xl border-2 border-indigo-200 space-y-2">
+                    <h4 class="text-xs font-black text-indigo-900 uppercase tracking-wider text-center">💡 Word Bank / Khung từ gợi ý:</h4>
+                    <div id="fill-word-box" class="flex flex-wrap gap-2 justify-center text-xs font-bold text-indigo-950">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- 15 Fill-in Items -->
+                <div id="fill-items-container" class="space-y-4 max-w-2xl mx-auto">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <div class="text-center pt-4 border-t border-slate-100">
+                    <button onclick="checkAllFillBlanks()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm shadow-md transition cursor-pointer">Check Answers / Kiểm tra đáp án ➔</button>
+                </div>
+            </div>
+
+            <div id="fill-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">✏️💯🎉</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Task 1 Completed!</h4>
+                <p class="text-sm text-slate-700 font-medium">Great job on completing all vocabulary sentences!<br><span class="text-xs text-slate-500">(Bạn đã điền chính xác tất cả các từ vựng!)</span></p>
+                <button onclick="unlockAndGoToErrorCorrection()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start Task 2: Error Correction / Sửa lỗi sai ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 4: TASK 2 - ERROR CORRECTION -->
+        <section id="tab-error-correction" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-purple-100 text-purple-700 font-black px-4 py-1.5 rounded-full tracking-wide">Task 2: Grammar Error Correction</span>
+                    <p class="text-xs text-slate-600 font-bold">
+                        <b>Instructions:</b> Each sentence contains <b>ONE error</b>. Identify the wrong word and type the <b>CORRECT FULL SENTENCE</b>.<br>
+                        <span class="text-indigo-600">(Mỗi câu chứa 1 lỗi sai ngữ pháp. Hãy gõ lại CẢ CÂU HOÀN CHỈNH ĐÃ SỬA LỖI)</span>
+                    </p>
+                </div>
+
+                <div id="ec-items-container" class="space-y-6 max-w-2xl mx-auto">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <div class="text-center pt-4 border-t border-slate-100">
+                    <button onclick="checkAllErrorCorrection()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm shadow-md transition cursor-pointer">Check Answers / Kiểm tra đáp án ➔</button>
+                </div>
+            </div>
+
+            <div id="ec-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🛠️🌟🏆</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Task 2 Completed!</h4>
+                <p class="text-sm text-slate-700 font-medium">You fixed all grammar errors correctly!<br><span class="text-xs text-slate-500">(Bạn đã phát hiện và sửa toàn bộ lỗi ngữ pháp!)</span></p>
+                <button onclick="unlockAndGoToFreeWriting()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start Personal Writing / Luyện viết tự do ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 5: TASK 3 - PERSONAL WRITING -->
+        <section id="tab-free-writing" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs uppercase bg-emerald-100 text-emerald-800 font-black px-4 py-1.5 rounded-full tracking-wide">Task 3: Guided Personal Writing</span>
+                    <h3 class="text-2xl font-black text-indigo-950 font-heading">Write 5 Original Sentences</h3>
+                    <p class="text-xs text-slate-600 font-bold max-w-xl mx-auto">
+                        <b>Instructions:</b> Write 5 original sentences using <b>First Conditional (If + Present Simple, Will + V)</b> and describing your <b>favourite movie</b>.<br>
+                        <span class="text-indigo-600">(Viết 5 câu tự chọn của bạn. ⚠️ <b>Lưu ý:</b> Không được chép lại y nguyên các câu ví dụ gợi ý bên dưới!)</span>
+                    </p>
+                </div>
+
+                <div class="space-y-4 max-w-2xl mx-auto">
+                    <!-- 5 Input Boxes with Hints -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-black text-indigo-900">Sentence 1: First Conditional (Hint: If I have free time this weekend, I will...)</label>
+                        <input id="fw-input-1" type="text" placeholder="e.g. If I have free time this weekend, I will watch an action movie." class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none">
+                        <p id="fw-err-1" class="text-xs text-rose-500 font-bold hidden">⚠️ Bạn đang chép y nguyên câu ví dụ! Hãy tự viết một câu khác của riêng bạn.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-black text-indigo-900">Sentence 2: First Conditional (Hint: If the weather is good tomorrow, I will go to...)</label>
+                        <input id="fw-input-2" type="text" placeholder="e.g. If the weather is nice tomorrow, my friends and I will go to an art gallery." class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none">
+                        <p id="fw-err-2" class="text-xs text-rose-500 font-bold hidden">⚠️ Bạn đang chép y nguyên câu ví dụ! Hãy tự viết một câu khác của riêng bạn.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-black text-indigo-900">Sentence 3: Favourite Movie Title & Genre (Hint: My favourite movie is [Title]. It is a/an [Genre] film.)</label>
+                        <input id="fw-input-3" type="text" placeholder="e.g. My favourite movie is Doraemon. It is an exciting animated film." class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none">
+                        <p id="fw-err-3" class="text-xs text-rose-500 font-bold hidden">⚠️ Bạn đang chép y nguyên câu ví dụ! Hãy tự viết một câu khác của riêng bạn.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-black text-indigo-900">Sentence 4: Why you like it / Adjectives (Hint: I love this movie because the plot is... and the actors are...)</label>
+                        <input id="fw-input-4" type="text" placeholder="e.g. I love it because the storyline is exciting and the visual effects are amazing." class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none">
+                        <p id="fw-err-4" class="text-xs text-rose-500 font-bold hidden">⚠️ Bạn đang chép y nguyên câu ví dụ! Hãy tự viết một câu khác của riêng bạn.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-black text-indigo-900">Sentence 5: Recommendation / Purpose (Hint: You should watch it to... / I always feel... when watching it)</label>
+                        <input id="fw-input-5" type="text" placeholder="e.g. You should watch this movie to relax after a long week." class="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-indigo-500 outline-none">
+                        <p id="fw-err-5" class="text-xs text-rose-500 font-bold hidden">⚠️ Bạn đang chép y nguyên câu ví dụ! Hãy tự viết một câu khác của riêng bạn.</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="submitFreeWriting()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-sm shadow-md transition cursor-pointer">Submit & See Model Answers / Nộp bài ➔</button>
+                </div>
+
+                <!-- Model Answers Section -->
+                <div id="fw-model-box" class="hidden bg-indigo-50 border-2 border-indigo-200 p-5 rounded-2xl max-w-2xl mx-auto space-y-3">
+                    <h4 class="font-black text-indigo-950 text-sm flex items-center gap-2"><span>💡</span> Model Answers / Gợi ý câu tham khảo:</h4>
+                    <ol class="list-decimal list-inside space-y-1.5 text-xs text-slate-700 font-bold leading-relaxed">
+                        <li>If I finish my homework early, I will go to a live music gig with my sister.</li>
+                        <li>If ticket prices are cheap, we will go to the cinema to watch the new science fiction film.</li>
+                        <li>My favourite movie is 'Spider-Man'. It is an exciting adventure movie.</li>
+                        <li>I really enjoy watching it because the story is interesting and the music is catchy.</li>
+                        <li>I often watch it with my friends to relax at the weekend.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="fw-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">💬✨🎉</span>
+                <h4 class="text-2xl font-heading font-black text-emerald-900">Writing Submitted!</h4>
+                <p class="text-sm text-slate-700 font-medium">Thank you for sharing your writing!<br><span class="text-xs text-slate-500">(Cảm ơn bạn đã nộp bài viết rất sáng tạo!)</span></p>
+                <button onclick="unlockAndGoToCompletion()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Go to Summary & Completion ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 6: COMPLETION / SUMMARY -->
+        <section id="tab-completion" class="tab-content hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-white border-4 border-indigo-300 p-8 rounded-3xl space-y-6 shadow-xl text-center">
+                <div class="space-y-2">
+                    <span class="text-6xl block animate-bounce">🎓🎨🎬</span>
+                    <h3 class="text-3xl font-heading font-black text-indigo-950">Congratulations! Lesson 8 Completed!</h3>
+                    <p class="text-sm text-slate-600 font-bold">You have successfully completed all parts of <span class="text-indigo-600 font-black">E3_Lesson 8: Music, Art & Movies</span>.</p>
+                </div>
+
+                <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-200 space-y-3 text-left">
+                    <h4 class="text-base font-black text-indigo-900 border-b border-indigo-200 pb-2">💡 Lesson 8 Grammar Summary / Tóm tắt ngữ pháp Bài 8:</h4>
+                    <ul class="space-y-2.5 text-xs md:text-sm text-slate-700 font-bold">
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-black">1.</span> 
+                            <span><b>Reflexive Pronouns (Đại từ phản thân):</b> myself, yourself, himself, herself, itself, ourselves, yourselves, themselves. Diễn tả hành động tự thực hiện tác động lên chính chủ ngữ (e.g., <i>He taught himself how to play drums</i>).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-black">2.</span> 
+                            <span><b>To-V for Purpose (Động từ nguyên mẫu chỉ mục đích):</b> Dùng `to + V` để giải thích lý do/mục đích làm việc gì đó (e.g., <i>We went to the gallery <b>to see</b> a famous landscape painting</i>).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-black">3.</span> 
+                            <span><b>First Conditional (Câu điều kiện loại 1):</b> 
+                                <br>- Structure: <code class="bg-indigo-100 px-1 py-0.5 rounded text-indigo-800">If + S + V(present simple), S + will/can + V(bare)</code>
+                                <br>- Usage: Diễn tả sự việc có thể xảy ra ở hiện tại hoặc tương lai (e.g., <i>If I go to the concert, I will take photos</i>).
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-indigo-600 font-black">4.</span> 
+                            <span><b>-ing vs -ed Adjectives:</b>
+                                <br>- <i>-ed Adjectives</i>: Chỉ cảm xúc của con người (excited, bored, amazed, disappointed).
+                                <br>- <i>-ing Adjectives</i>: Chỉ tính chất của sự vật, sự việc, bộ phim, bài hát (exciting, boring, amazing, disappointing).
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="location.reload()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm">🔄 Restart Lesson / Ôn lại từ đầu</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // VOCABULARY DATA LESSON 8 (A2 LEVEL APPROPRIATE)
+        const vocabularyData = [
+            { word: "audience", ipa: "/ˈɔːdiəns/", vi: "khán giả", ex: "The audience clapped loudly after the show.", icon: "👏" },
+            { word: "drummer", ipa: "/ˈdrʌmə(r)/", vi: "tay trống", ex: "The drummer played very well.", icon: "🥁" },
+            { word: "drums", ipa: "/drʌmz/", vi: "trống", ex: "My brother is learning to play the drums.", icon: "🥁" },
+            { word: "guitar", ipa: "/ɡɪˈtɑː(r)/", vi: "đàn ghi-ta", ex: "I want to learn the guitar.", icon: "🎸" },
+            { word: "guitarist", ipa: "/ɡɪˈtɑːrɪst/", vi: "nghệ sĩ chơi ghi-ta", ex: "The guitarist smiled at the audience.", icon: "🎸" },
+            { word: "keyboard player", ipa: "/ˈkiːbɔːd pleɪə(r)/", vi: "người chơi đàn phím", ex: "The keyboard player joined the band last year.", icon: "🎹" },
+            { word: "keyboards", ipa: "/ˈkiːbɔːdz/", vi: "đàn phím", ex: "She can play keyboards very well.", icon: "🎹" },
+            { word: "light show", ipa: "/laɪt ʃəʊ/", vi: "màn trình diễn ánh sáng", ex: "The concert had an amazing light show.", icon: "💡" },
+            { word: "microphone", ipa: "/ˈmaɪkrəfəʊn/", vi: "micro", ex: "The singer picked up the microphone.", icon: "🎙️" },
+            { word: "singer", ipa: "/ˈsɪŋə(r)/", vi: "ca sĩ", ex: "She wants to be a singer.", icon: "🎤" },
+            { word: "stage", ipa: "/steɪdʒ/", vi: "sân khấu", ex: "The band is waiting behind the stage.", icon: "🎭" },
+            { word: "album", ipa: "/ˈælbəm/", vi: "album", ex: "My favourite band released a new album.", icon: "💿" },
+            { word: "band members", ipa: "/bænd ˈmembəz/", vi: "các thành viên ban nhạc", ex: "The band members thanked the audience.", icon: "🎸" },
+            { word: "catchy", ipa: "/ˈkætʃi/", vi: "dễ nhớ (giai điệu)", ex: "This song is catchy. I can't stop singing it.", icon: "🎶" },
+            { word: "cover songs", ipa: "/ˈkʌvə sɒŋz/", vi: "bài hát cover", ex: "The band played some famous cover songs.", icon: "🎵" },
+            { word: "gig", ipa: "/ɡɪɡ/", vi: "buổi biểu diễn", ex: "We are going to a gig on Saturday.", icon: "🎟️" },
+            { word: "live", ipa: "/laɪv/", vi: "trực tiếp", ex: "I love listening to live music.", icon: "📻" },
+            { word: "lyrics", ipa: "/ˈlɪrɪks/", vi: "lời bài hát", ex: "I know all the lyrics to this song.", icon: "📜" },
+            { word: "on tour", ipa: "/ɒn tʊə(r)/", vi: "đang lưu diễn", ex: "The band is on tour in Asia.", icon: "🚌" },
+            { word: "exhibit", ipa: "/ɪɡˈzɪbɪt/", vi: "triển lãm", ex: "We are going to an art exhibit tomorrow.", icon: "🖼️" },
+            { word: "gallery", ipa: "/ˈɡæləri/", vi: "phòng trưng bày nghệ thuật", ex: "We visited a new gallery last weekend.", icon: "🏛️" },
+            { word: "landscape", ipa: "/ˈlændskeɪp/", vi: "tranh phong cảnh", ex: "I like this landscape painting.", icon: "🏞️" },
+            { word: "photograph", ipa: "/ˈfəʊtəɡrɑːf/", vi: "bức ảnh", ex: "She took a nice photograph.", icon: "📸" },
+            { word: "portrait", ipa: "/ˈpɔːtrət/", vi: "tranh chân dung", ex: "The museum has a famous portrait.", icon: "🖼️" },
+            { word: "sculpture", ipa: "/ˈskʌlptʃə(r)/", vi: "tác phẩm điêu khắc", ex: "We saw a large sculpture in the park.", icon: "🗿" },
+            { word: "action", ipa: "/ˈækʃn/", vi: "phim hành động", ex: "My brother loves action films.", icon: "💥" },
+            { word: "adventure", ipa: "/ədˈventʃə(r)/", vi: "phim phiêu lưu", ex: "We watched an adventure movie yesterday.", icon: "🤠" },
+            { word: "animated", ipa: "/ˈænɪmeɪtɪd/", vi: "phim hoạt hình", ex: "My little sister enjoys animated films.", icon: "🦁" }
+        ];
+
+        // TASK 1: FILL IN THE BLANKS (15 SENTENCES REVISED)
+        const fillItemsData = [
+            { id: 1, sentence: "The big ____ cheered when the band walked onto the stage.", answer: "audience" },
+            // Nhận xét 2: Đổi bối cảnh để kiểm tra từ 'lyrics'
+            { id: 2, sentence: "I love reading the song ____ to sing along with my favourite artist.", answer: "lyrics" },
+            { id: 3, sentence: "There is a beautiful stone ____ of a lion near the park entrance.", answer: "statue" },
+            { id: 4, sentence: "The movie was so ____ that everyone was sitting on the edge of their seats.", answer: "exciting" },
+            // Nhận xét 3: Đổi qua kiểm tra từ 'exhibit'
+            { id: 5, sentence: "We went to see an art ____ with many interesting paintings.", answer: "exhibit" },
+            { id: 6, sentence: "I love this song because it has a very ____ melody that stays in my head.", answer: "catchy" },
+            { id: 7, sentence: "The lead singer spoke into the ____ to welcome all fans.", answer: "microphone" },
+            { id: 8, sentence: "We went to an art ____ to see famous paintings by local artists.", answer: "gallery" },
+            // Nhận xét 4: Điền cả cụm 'on tour'
+            { id: 9, sentence: "My favorite band is currently ____ across five European cities.", answer: "on tour" },
+            // Nhận xét 5: 'stunning' -> 'beautiful'
+            { id: 10, sentence: "He painted a beautiful ____ painting showing mountains and a quiet lake.", answer: "landscape" },
+            // Nhận xét 6: Sửa lại câu laser show ngắn gọn, dễ hiểu chuẩn A2
+            { id: 11, sentence: "The concert ended with an amazing laser ____.", answer: "light show" },
+            // Nhận xét 7: Diễn đạt tự nhiên 'nice photograph'
+            { id: 12, sentence: "She took a nice ____ of her friends in front of the museum.", answer: "photograph" },
+            { id: 13, sentence: "My brother bought a new ____ album from his favourite singer.", answer: "album" },
+            { id: 14, sentence: "We bought tickets for a small live music ____ this Saturday evening.", answer: "gig" },
+            { id: 15, sentence: "Children love watching ____ films because of the cute cartoon characters.", answer: "animated" }
+        ];
+
+        // TASK 2: ERROR CORRECTION (10 ITEMS)
+        const ecItemsData = [
+            { 
+                id: 1, 
+                incorrectSentence: "He learned to play the guitar by him.", 
+                correctSentence: "He learned to play the guitar by himself.",
+                errorFocus: "Grammar: Reflexive Pronouns",
+                hint: "Sử dụng đại từ phản thân 'himself' thay vì 'him'."
+            },
+            { 
+                id: 2, 
+                incorrectSentence: "If I will go to the concert, I will buy a T-shirt.", 
+                correctSentence: "If I go to the concert, I will buy a T-shirt.",
+                errorFocus: "Grammar: First Conditional (If-clause)",
+                hint: "Trong mệnh đề If của câu điều kiện loại 1, dùng thì Hiện tại đơn (go), không dùng 'will go'."
+            },
+            { 
+                id: 3, 
+                incorrectSentence: "The movie was so bored that I fell asleep.", 
+                correctSentence: "The movie was so boring that I fell asleep.",
+                errorFocus: "Grammar: -ing vs -ed Adjectives",
+                hint: "Chỉ tính chất của bộ phim dùng tính từ đuôi -ing ('boring')."
+            },
+            { 
+                id: 4, 
+                incorrectSentence: "We went to the art gallery for see the new paintings.", 
+                correctSentence: "We went to the art gallery to see the new paintings.",
+                errorFocus: "Grammar: To-V for Purpose",
+                hint: "Chỉ mục đích dùng 'to see' thay vì 'for see'."
+            },
+            { 
+                id: 5, 
+                incorrectSentence: "She bought a microphone for singing by her.", 
+                correctSentence: "She bought a microphone to sing by herself.",
+                errorFocus: "Grammar: To-V for Purpose & Reflexive Pronouns",
+                hint: "Dùng 'to sing' (chỉ mục đích) và 'herself' (đại từ phản thân)."
+            },
+            { 
+                id: 6, 
+                incorrectSentence: "If the tickets are cheap, we go to the cinema tonight.", 
+                correctSentence: "If the tickets are cheap, we will go to the cinema tonight.",
+                errorFocus: "Grammar: First Conditional (Main clause)",
+                hint: "Mệnh đề chính câu điều kiện loại 1 dùng 'will + V' ('will go')."
+            },
+            { 
+                id: 7, 
+                incorrectSentence: "I am very interesting in learning how to play the drums.", 
+                correctSentence: "I am very interested in learning how to play the drums.",
+                errorFocus: "Grammar: -ing vs -ed Adjectives",
+                hint: "Diễn tả cảm xúc của con người dùng tính từ đuôi -ed ('interested')."
+            },
+            { 
+                id: 8, 
+                incorrectSentence: "They painted the wall by themself.", 
+                correctSentence: "They painted the wall by themselves.",
+                errorFocus: "Grammar: Reflexive Pronouns",
+                hint: "Đại từ phản thân số nhiều của 'they' là 'themselves' (không phải themself)."
+            },
+            { 
+                id: 9, 
+                incorrectSentence: "If she studies hard, she passes the music exam.", 
+                correctSentence: "If she studies hard, she will pass the music exam.",
+                errorFocus: "Grammar: First Conditional (Main clause)",
+                hint: "Mệnh đề chính dùng 'will pass'."
+            },
+            { 
+                id: 10, 
+                incorrectSentence: "He went home early to resting after the live show.", 
+                correctSentence: "He went home early to rest after the live show.",
+                errorFocus: "Grammar: To-V for Purpose",
+                hint: "Sau 'to' chỉ mục đích dùng động từ nguyên mẫu V-bare ('to rest')."
+            }
+        ];
+
+        // EXAMPLE SENTENCES TO CHECK AGAINST IN TASK 3
+        const exampleSentencesTask3 = [
+            "If I have free time this weekend, I will watch an action movie.",
+            "If the weather is nice tomorrow, my friends and I will go to an art gallery.",
+            "My favourite movie is Harry Potter, which is an exciting fantasy film.",
+            "My favourite movie is Harry Potter.",
+            "My favourite movie is Doraemon. It is an exciting animated film.",
+            "I love it because the storyline is gripping and the visual effects are amazing.",
+            "I love it because the storyline is exciting and the visual effects are amazing.",
+            "You should watch this movie to relax yourself after a stressful week.",
+            "You should watch this movie to relax after a long week."
+        ];
+
+        // Nhận xét 8: Bỏ qua toàn bộ dấu câu khi so sánh trùng lặp câu ví dụ
+        function stripPunctuationAndWords(text) {
+            return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        // APP STATE
+        let cardQueue = [];
+        let isCardFlipped = false;
+        let currentCard = null;
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWordBankTable();
+            initFlashcards();
+            renderFillBlanks();
+            renderErrorCorrection();
+        });
+
+        // TAB NAVIGATION
+        function switchTab(tabName) {
+            const tabs = ['reference', 'flashcard', 'fill-blanks', 'error-correction', 'free-writing', 'completion'];
+            tabs.forEach(t => {
+                const contentEl = document.getElementById(`tab-${t}`);
+                const btnEl = document.getElementById(`btn-${t}`);
+                if (t === tabName) {
+                    contentEl.classList.remove('hidden');
+                    contentEl.classList.add('block');
+                    btnEl.classList.remove('text-slate-500', 'bg-transparent');
+                    btnEl.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                } else {
+                    contentEl.classList.remove('block');
+                    contentEl.classList.add('hidden');
+                    btnEl.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                    btnEl.classList.add('text-slate-500');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // RENDER WORD BANK TABLE
+        function renderWordBankTable() {
+            const tbody = document.getElementById('reference-table-body');
+            document.getElementById('word-count-badge').innerText = `${vocabularyData.length} Words`;
+            tbody.innerHTML = vocabularyData.map(item => `
+                <tr class="hover:bg-indigo-50/30 transition">
+                    <td class="p-3.5 font-extrabold text-indigo-950 flex items-center gap-2">
+                        <span>${item.icon}</span> <span>${item.word}</span>
+                    </td>
+                    <td class="p-3.5 text-slate-700 font-bold">${item.vi}</td>
+                    <td class="p-3.5 text-indigo-600 font-mono font-bold">${item.ipa}</td>
+                    <td class="p-3.5 text-slate-600 font-medium italic">"${item.ex}"</td>
+                </tr>
+            `).join('');
+        }
+
+        // FLASHCARD SYSTEM
+        function initFlashcards() {
+            cardQueue = [...vocabularyData];
+            updateFlashcardUI();
+        }
+
+        function updateFlashcardUI() {
+            if (cardQueue.length === 0) {
+                document.getElementById('card-arena').classList.add('hidden');
+                document.getElementById('flashcard-success-box').classList.remove('hidden');
+                document.getElementById('queue-text').innerText = '0 cards';
+                document.getElementById('progress-bar').style.width = '100%';
+                return;
+            }
+
+            document.getElementById('card-arena').classList.remove('hidden');
+            document.getElementById('flashcard-success-box').classList.add('hidden');
+
+            currentCard = cardQueue[0];
+            isCardFlipped = false;
+            document.getElementById('flashcard-inner').classList.remove('card-flipped');
+
+            // Set Front Side Content
+            document.getElementById('f-prompt').innerText = currentCard.word;
+            document.getElementById('f-ipa').innerText = currentCard.ipa;
+            document.getElementById('f-example').innerText = `"${currentCard.ex}"`;
+            document.getElementById('f-extra-content').classList.remove('hidden');
+
+            // Set Back Side Content
+            document.getElementById('b-answer').innerText = currentCard.vi;
+            document.getElementById('b-ipa').innerText = currentCard.ipa;
+            document.getElementById('b-example').innerText = `"${currentCard.ex}"`;
+
+            // Progress text & bar
+            const total = vocabularyData.length;
+            const remaining = cardQueue.length;
+            const done = total - remaining;
+            const percentage = Math.round((done / total) * 100);
+
+            document.getElementById('queue-text').innerText = `${remaining} / ${total} cards`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function flipCard() {
+            const inner = document.getElementById('flashcard-inner');
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                inner.classList.add('card-flipped');
+            } else {
+                inner.classList.remove('card-flipped');
+            }
+        }
+
+        function handleAnkiAction(rating) {
+            if (cardQueue.length === 0) return;
+
+            const card = cardQueue.shift();
+            if (rating === 'again' || rating === 'hard') {
+                cardQueue.push(card);
+            }
+            updateFlashcardUI();
+        }
+
+        function resetProgress() {
+            initFlashcards();
+        }
+
+        function speakText(text, event) {
+            if (event) event.stopPropagation();
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function unlockAndGoToFillBlanks() {
+            document.getElementById('btn-fill-blanks').classList.remove('disabled-tab');
+            switchTab('fill-blanks');
+        }
+
+        // TASK 1: FILL IN THE BLANKS LOGIC
+        function renderFillBlanks() {
+            // Render Word Bank Box (Nhận xét 4: Cụm 'on tour' hiển thị nguyên cụm)
+            const wordBox = document.getElementById('fill-word-box');
+            const wordsList = fillItemsData.map(item => item.answer).sort();
+            wordBox.innerHTML = wordsList.map(w => `<span class="bg-white px-3 py-1.5 rounded-xl border border-indigo-200 shadow-sm font-extrabold text-indigo-800">${w}</span>`).join('');
+
+            // Render 15 Fill-in Items
+            const container = document.getElementById('fill-items-container');
+            container.innerHTML = fillItemsData.map((item, index) => {
+                const parts = item.sentence.split('____');
+                return `
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                        <div class="text-xs md:text-sm font-bold text-slate-800 leading-relaxed flex items-center flex-wrap gap-1">
+                            <span class="text-indigo-600 font-black">${index + 1}.</span>
+                            <span>${parts[0]}</span>
+                            <input id="fill-input-${item.id}" type="text" placeholder="type word..." class="px-3 py-1 bg-white border-2 border-indigo-200 rounded-lg text-indigo-900 font-extrabold text-xs focus:border-indigo-600 outline-none w-36 text-center">
+                            <span>${parts[1] || ''}</span>
+                        </div>
+                        <p id="fill-feedback-${item.id}" class="text-xs font-bold hidden"></p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkAllFillBlanks() {
+            let allCorrect = true;
+
+            fillItemsData.forEach(item => {
+                const input = document.getElementById(`fill-input-${item.id}`);
+                const feedback = document.getElementById(`fill-feedback-${item.id}`);
+                const userAns = input.value.trim().toLowerCase().replace(/\s+/g, ' ');
+                const correctAns = item.answer.toLowerCase().trim();
+
+                feedback.classList.remove('hidden', 'text-emerald-600', 'text-rose-500');
+
+                if (userAns === correctAns) {
+                    input.classList.remove('border-rose-400', 'bg-rose-50');
+                    input.classList.add('border-emerald-500', 'bg-emerald-50');
+                    feedback.classList.add('text-emerald-600');
+                    feedback.innerText = '✓ Correct!';
+                } else {
+                    allCorrect = false;
+                    input.classList.remove('border-emerald-500', 'bg-emerald-50');
+                    input.classList.add('border-rose-400', 'bg-rose-50');
+                    feedback.classList.add('text-rose-500');
+                    feedback.innerText = `✗ Incorrect. Correct answer: "${item.answer}"`;
+                }
+            });
+
+            if (allCorrect) {
+                document.getElementById('fill-success-box').classList.remove('hidden');
+                document.getElementById('fill-success-box').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function unlockAndGoToErrorCorrection() {
+            document.getElementById('btn-error-correction').classList.remove('disabled-tab');
+            switchTab('error-correction');
+        }
+
+        // TASK 2: ERROR CORRECTION LOGIC
+        function renderErrorCorrection() {
+            const container = document.getElementById('ec-items-container');
+            container.innerHTML = ecItemsData.map((item, index) => {
+                return `
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex justify-between items-start flex-wrap gap-2">
+                            <span class="text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full">Question ${index + 1}</span>
+                            <span class="text-[11px] text-slate-500 font-bold">${item.errorFocus}</span>
+                        </div>
+                        
+                        <p class="text-sm font-bold text-rose-600 bg-rose-50/70 p-2.5 rounded-xl border border-rose-100">
+                            ❌ <span class="line-through">${item.incorrectSentence}</span>
+                        </p>
+
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-600">Type the full correct sentence / Gõ lại câu đúng:</label>
+                            <input id="ec-input-${item.id}" type="text" placeholder="Type full correct sentence..." class="w-full p-2.5 bg-white border-2 border-slate-200 rounded-xl text-xs md:text-sm font-extrabold focus:border-indigo-500 outline-none">
+                        </div>
+
+                        <div id="ec-feedback-${item.id}" class="hidden text-xs font-bold p-2.5 rounded-xl"></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkAllErrorCorrection() {
+            let allCorrect = true;
+
+            ecItemsData.forEach(item => {
+                const input = document.getElementById(`ec-input-${item.id}`);
+                const feedback = document.getElementById(`ec-feedback-${item.id}`);
+                
+                const cleanUser = input.value.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ');
+                const cleanCorrect = item.correctSentence.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ');
+
+                feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (cleanUser === cleanCorrect) {
+                    input.classList.remove('border-rose-400');
+                    input.classList.add('border-emerald-500');
+                    feedback.classList.add('bg-emerald-50', 'text-emerald-800');
+                    feedback.innerHTML = `✓ <b>Excellent!</b> Correct sentence: "<i>${item.correctSentence}</i>"`;
+                } else {
+                    allCorrect = false;
+                    input.classList.remove('border-emerald-500');
+                    input.classList.add('border-rose-400');
+                    feedback.classList.add('bg-rose-50', 'text-rose-800');
+                    feedback.innerHTML = `✗ <b>Not quite right.</b><br>Gợi ý: ${item.hint}<br>👉 Đáp án đúng: "<b>${item.correctSentence}</b>"`;
+                }
+            });
+
+            if (allCorrect) {
+                document.getElementById('ec-success-box').classList.remove('hidden');
+                document.getElementById('ec-success-box').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function unlockAndGoToFreeWriting() {
+            document.getElementById('btn-free-writing').classList.remove('disabled-tab');
+            switchTab('free-writing');
+        }
+
+        // TASK 3: PERSONAL WRITING LOGIC
+        // Nhận xét 8: Loại bỏ toàn bộ dấu câu khi so sánh trùng lặp từ với câu ví dụ
+        function submitFreeWriting() {
+            let valid = true;
+
+            for (let i = 1; i <= 5; i++) {
+                const input = document.getElementById(`fw-input-${i}`);
+                const err = document.getElementById(`fw-err-${i}`);
+                const val = input.value.trim();
+
+                err.classList.add('hidden');
+                input.classList.remove('border-rose-400');
+
+                if (!val) {
+                    valid = false;
+                    input.classList.add('border-rose-400');
+                } else {
+                    // Check if student copied example sentence ignoring ALL punctuation & spacing
+                    const cleanVal = stripPunctuationAndWords(val);
+                    const isCopied = exampleSentencesTask3.some(ex => stripPunctuationAndWords(ex) === cleanVal);
+                    
+                    if (isCopied) {
+                        valid = false;
+                        err.classList.remove('hidden');
+                        input.classList.add('border-rose-400');
+                    }
+                }
+            }
+
+            if (!valid) {
+                alert("Vui lòng hoàn thành 5 câu và KHÔNG chép lại y nguyên câu ví dụ gợi ý!");
+                return;
+            }
+
+            document.getElementById('fw-model-box').classList.remove('hidden');
+            document.getElementById('fw-success-box').classList.remove('hidden');
+            document.getElementById('fw-success-box').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function unlockAndGoToCompletion() {
+            document.getElementById('btn-completion').classList.remove('disabled-tab');
+            switchTab('completion');
+        }
+    </script>
+</body>
+</html>
