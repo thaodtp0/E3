@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E3_Lesson 14 - Media</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <style>
+        *, body, html, button, span, h1, h2, h3, p, div, input, select, textarea { 
+            font-family: 'Quicksand', sans-serif; 
+            font-weight: 600;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .perspective { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .card-inner { transition: transform 0.5s; transform-style: preserve-3d; }
+        .card-flipped { transform: rotateY(180deg); }
+        .disabled-tab { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; }
+        
+        /* Bingo Highlight Circles */
+        .bingo-marked {
+            background-color: #ffedd5 !important;
+            border-color: #f97316 !important;
+            color: #ea580c !important;
+            position: relative;
+        }
+        .bingo-marked::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 3px solid #f97316;
+            border-radius: 9999px;
+            pointer-events: none;
+        }
+
+        /* Maze Grid Styles (8x8) */
+        .maze-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+        }
+        .maze-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            border-radius: 0.5rem;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .maze-wall { background-color: #cbd5e1; border: 1.5px solid #94a3b8; }
+        .maze-path { background-color: #ffffff; border: 1.5px solid #fed7aa; }
+        .maze-player { background-color: #ffebd5; border: 2px solid #f97316; transform: scale(1.05); }
+        .maze-obstacle { background-color: #fef3c7; border: 2px solid #f59e0b; animation: pulse 2s infinite; }
+        .maze-finish { background-color: #dcfce7; border: 2px solid #22c55e; }
+    </style>
+</head>
+<body class="bg-[#fffaf7] text-slate-800 min-h-screen flex flex-col selection:bg-orange-200 pb-12">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-[#FFEDD5] via-[#FED7AA] to-[#FDE68A] border-b-4 border-dashed border-orange-300 shadow-sm p-6 text-center rounded-b-3xl">
+        <h1 class="text-3xl md:text-4xl font-black tracking-wide drop-shadow-sm text-orange-950">📺 E3_Lesson 14: Media 📰</h1>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-4xl w-full mx-auto px-4 mt-6">
+        <div class="flex bg-orange-100/70 p-1.5 rounded-2xl border border-orange-200 shadow-inner overflow-x-auto">
+            <button onclick="switchTab('reference')" id="btn-reference" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center bg-white text-orange-600 shadow-sm transition cursor-pointer whitespace-nowrap">📚 Word bank</button>
+            <button onclick="switchTab('flashcard')" id="btn-flashcard" class="tab-btn flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition cursor-pointer whitespace-nowrap">🎴 Flashcards</button>
+            <button onclick="switchTab('bingo-game')" id="btn-bingo-game" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🎯 Word bingo</button>
+            <button onclick="switchTab('maze-game')" id="btn-maze-game" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🧩 Media maze</button>
+            <button onclick="switchTab('writing-practice')" id="btn-writing-practice" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">✍️ Writing practice</button>
+            <button onclick="switchTab('completion')" id="btn-completion" class="tab-btn disabled-tab flex-1 py-3 px-2 text-xs md:text-sm font-black rounded-xl text-center text-slate-500 transition whitespace-nowrap">🎉 Completion</button>
+        </div>
+    </div>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        
+        <!-- TAB 1: WORD BANK -->
+        <section id="tab-reference" class="tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm space-y-4">
+                <div>
+                    <h2 class="text-2xl font-black text-orange-950 font-heading">📖 Vocabulary list</h2>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead>
+                            <tr class="bg-orange-50 border-b border-slate-200 text-orange-950 text-xs uppercase tracking-wider font-black">
+                                <th class="p-3.5">English word</th>
+                                <th class="p-3.5">Nghĩa tiếng Việt</th>
+                                <th class="p-3.5">IPA</th>
+                                <th class="p-3.5">Câu ví dụ (A2)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reference-table-body" class="divide-y divide-slate-100 text-xs md:text-sm">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="switchTab('flashcard')" class="px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl text-sm shadow-sm transition cursor-pointer">Start flashcards practice ➔</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: FLASHCARDS -->
+        <section id="tab-flashcard" class="tab-content hidden space-y-6">
+            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-orange-300 shadow-sm flex justify-between items-center flex-wrap gap-2">
+                <div class="text-sm font-black text-slate-600">Remaining queue: <span id="queue-text" class="text-orange-600 font-extrabold">0 cards</span></div>
+                <div class="w-full sm:w-1/3 bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progress-bar" class="bg-gradient-to-r from-orange-400 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <button onclick="resetProgress()" class="text-xs text-rose-500 hover:underline font-black cursor-pointer">🔄 Reset session</button>
+            </div>
+            
+            <div id="flashcard-container" class="space-y-6">
+                <div id="card-arena" class="perspective w-full max-w-md mx-auto h-[420px] cursor-pointer">
+                    <div id="flashcard-inner" onclick="flipCard()" class="card-inner w-full h-full relative border-4 border-orange-300 rounded-3xl shadow-md bg-white">
+                        
+                        <!-- FRONT SIDE -->
+                        <div class="backface-hidden absolute inset-0 p-6 flex flex-col justify-between items-center text-center bg-orange-50/30 rounded-[20px]">
+                            <span id="f-badge" class="text-xs font-black text-orange-700 uppercase tracking-widest bg-orange-100 px-4 py-1.5 rounded-full">Prompt</span>
+                            
+                            <div class="space-y-3 my-auto w-full">
+                                <h3 id="f-prompt" class="text-2xl md:text-3xl font-black text-orange-950"></h3>
+                                
+                                <div id="f-extra-content" class="hidden space-y-2 pt-2 border-t border-orange-200">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <span id="f-ipa" class="text-orange-600 font-bold text-sm font-mono"></span>
+                                        <button id="f-audio-btn" onclick="speakText(currentCard.word, event)" class="w-7 h-7 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition flex items-center justify-center text-xs cursor-pointer shadow-sm">🔊</button>
+                                    </div>
+                                    <p id="f-example" class="text-slate-600 text-xs px-2 font-medium leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-orange-600 font-black">👉 Tap card to reveal answer 👈</p>
+                        </div>
+
+                        <!-- BACK SIDE -->
+                        <div class="backface-hidden w-full h-full absolute inset-0 p-6 flex flex-col justify-between bg-slate-900 text-white rounded-[22px]" style="transform: rotateY(180deg);">
+                            <span id="b-badge" class="text-xs font-black text-orange-400 uppercase tracking-widest bg-slate-800 px-4 py-1.5 rounded-full w-max mx-auto">Answer</span>
+                            
+                            <div class="my-auto space-y-3 text-center">
+                                <h2 id="b-answer" class="text-3xl md:text-4xl font-black text-amber-300"></h2>
+                                
+                                <div id="b-extra-content" class="space-y-2 border-t border-slate-800 pt-3">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <span id="b-ipa" class="text-orange-300 font-bold text-sm font-mono"></span>
+                                        <button id="b-audio-btn" onclick="speakText(currentCard.word, event)" class="w-7 h-7 bg-orange-900 hover:bg-orange-800 text-orange-200 rounded-full transition flex items-center justify-center text-xs cursor-pointer shadow-sm">🔊</button>
+                                    </div>
+                                    <p id="b-example" class="text-slate-300 text-xs px-2 font-medium leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-center text-slate-500 font-bold">Rate how well you recalled this 👇</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="w-full max-w-md mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-4 gap-2">
+                    <button onclick="handleAnkiAction('again')" class="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-rose-600">Again</span>
+                        <span class="text-[10px] text-rose-400 font-bold block mt-0.5">&lt; 1m</span>
+                    </button>
+                    <button onclick="handleAnkiAction('hard')" class="p-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-amber-600">Hard</span>
+                        <span class="text-[10px] text-amber-400 font-bold block mt-0.5">10m</span>
+                    </button>
+                    <button onclick="handleAnkiAction('good')" class="p-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-center transition cursor-pointer">
+                        <span class="block text-xs font-black text-orange-600">Good</span>
+                        <span class="text-[10px] text-orange-400 font-bold block mt-0.5">1d</span>
+                    </button>
+                    <button onclick="handleAnkiAction('easy')" class="p-2 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-xl text-center transition shadow-sm cursor-pointer">
+                        <span class="block text-xs font-black text-teal-600">Easy</span>
+                        <span class="text-[10px] text-teal-400 font-bold block mt-0.5">4d</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="flashcard-success-box" class="max-w-md mx-auto bg-orange-50 border-4 border-orange-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">📰📺🎤</span>
+                <h4 class="text-2xl font-heading font-black text-orange-950">Vocabulary mastered!</h4>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed">Awesome work! You completed all media vocabulary flashcards. Ready for the Bingo challenge?</p>
+                <button onclick="unlockAndGoToBingo()" class="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start word bingo ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 3: BINGO GAME -->
+        <section id="tab-bingo-game" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm space-y-6">
+                <!-- Header 2 levels -->
+                <div class="text-center space-y-1.5">
+                    <span class="text-xs uppercase bg-amber-100 text-amber-900 font-black px-4 py-1.5 rounded-full tracking-wide">Task 1: Vocabulary Bingo Game</span>
+                    <p class="text-xs md:text-sm text-slate-600 font-bold pt-1">Match prompt words to the bingo board! Complete 3 lines (horizontal, vertical, or diagonal) to win!</p>
+                </div>
+
+                <!-- Prompt Card & Countdown Timer -->
+                <div class="max-w-md mx-auto bg-gradient-to-r from-orange-500 to-amber-500 text-white p-5 rounded-2xl shadow-md flex items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <span class="text-[10px] uppercase font-black tracking-widest text-orange-200">Current prompt (Vietnamese)</span>
+                        <h4 id="bingo-prompt-text" class="text-lg font-black text-amber-100">Click start to play!</h4>
+                    </div>
+                    <div class="text-right flex-shrink-0 bg-white/20 backdrop-blur px-3 py-2 rounded-xl border border-white/30">
+                        <span class="text-[10px] block font-black uppercase text-orange-100">Time left</span>
+                        <span id="bingo-timer" class="text-2xl font-black text-white font-mono">10s</span>
+                    </div>
+                </div>
+
+                <!-- 4x4 Bingo Grid -->
+                <div id="bingo-board" class="grid grid-cols-4 gap-2.5 max-w-md mx-auto bg-orange-100/50 p-3 rounded-2xl border-2 border-orange-200">
+                </div>
+
+                <!-- Bingo Status & Control -->
+                <div class="text-center space-y-3">
+                    <div id="bingo-lines-count" class="text-sm font-black text-orange-950">Lines completed: <span class="text-orange-600 text-lg">0 / 3</span></div>
+                    <button id="btn-start-bingo" onclick="startBingoGame()" class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl text-sm shadow-md transition cursor-pointer">Start bingo game 🎲</button>
+                </div>
+            </div>
+
+            <div id="bingo-success-box" class="max-w-md mx-auto bg-orange-50 border-4 border-orange-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎉🏆📺</span>
+                <h4 class="text-2xl font-heading font-black text-orange-950">Bingo victory!</h4>
+                <p class="text-sm text-slate-700 font-medium">Fantastic! You matched 3 lines on the board. Let's move to the Grammar Media Maze!</p>
+                <button onclick="unlockAndGoToMaze()" class="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start media maze ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 4: MAZE GAME -->
+        <section id="tab-maze-game" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm space-y-6">
+                <!-- Header 2 levels -->
+                <div class="text-center space-y-1.5">
+                    <span class="text-xs uppercase bg-orange-100 text-orange-900 font-black px-4 py-1.5 rounded-full tracking-wide">Task 2: Grammar Media Maze</span>
+                    <p class="text-xs md:text-sm text-slate-600 font-bold pt-1">Navigate the player (🚶‍♂️) to solve ALL 10 obstacles (❓) before reaching the finish trophy (🏆)!</p>
+                </div>
+
+                <!-- Maze Progress Header -->
+                <div class="flex justify-between items-center bg-orange-50 p-4 rounded-2xl border border-orange-200 max-w-2xl mx-auto">
+                    <div class="text-xs font-black text-orange-950">
+                        Obstacles solved: <span id="maze-score-text" class="text-orange-600 text-base font-extrabold">0 / 10</span>
+                    </div>
+                    <div class="text-xs font-black text-slate-600">
+                        Status: <span id="maze-status-text" class="text-amber-600 font-extrabold">10 Challenges Required</span>
+                    </div>
+                </div>
+
+                <!-- MAZE & CONTROLS CONTAINER -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center max-w-3xl mx-auto">
+                    
+                    <!-- MAZE BOARD MAP (8x8 Grid) -->
+                    <div id="maze-board-map" class="maze-grid max-w-[340px] mx-auto bg-slate-100 p-2 rounded-2xl border-4 border-orange-300 shadow-inner">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- MAZE CONTROLS & CHALLENGES -->
+                    <div class="space-y-4">
+                        <div id="maze-controls-box" class="bg-orange-50/60 p-4 rounded-2xl border border-orange-200 text-center space-y-3">
+                            <h4 class="text-xs font-black text-orange-900 uppercase tracking-wider">Navigation Controls</h4>
+                            <div class="grid grid-cols-3 gap-2 max-w-[160px] mx-auto">
+                                <div></div>
+                                <button onclick="movePlayer(-1, 0)" class="p-2.5 bg-white border-2 border-orange-300 hover:bg-orange-100 font-black text-orange-800 rounded-xl shadow-sm transition cursor-pointer">⬆️</button>
+                                <div></div>
+                                <button onclick="movePlayer(0, -1)" class="p-2.5 bg-white border-2 border-orange-300 hover:bg-orange-100 font-black text-orange-800 rounded-xl shadow-sm transition cursor-pointer">⬅️</button>
+                                <div class="flex items-center justify-center text-lg">🧭</div>
+                                <button onclick="movePlayer(0, 1)" class="p-2.5 bg-white border-2 border-orange-300 hover:bg-orange-100 font-black text-orange-800 rounded-xl shadow-sm transition cursor-pointer">➡️</button>
+                                <div></div>
+                                <button onclick="movePlayer(1, 0)" class="p-2.5 bg-white border-2 border-orange-300 hover:bg-orange-100 font-black text-orange-800 rounded-xl shadow-sm transition cursor-pointer">⬇️</button>
+                                <div></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-semibold">Use buttons or Arrow keys on keyboard</p>
+                        </div>
+
+                        <!-- CHALLENGE POPUP CARD IN MAZE -->
+                        <div id="maze-challenge-box" class="hidden bg-amber-50 p-5 rounded-2xl border-2 border-orange-400 space-y-3 shadow-md">
+                            <div class="flex items-center justify-between border-b border-orange-200 pb-2">
+                                <span class="text-xs font-black text-orange-800 uppercase" id="maze-challenge-title">Obstacle Challenge</span>
+                                <span class="text-[10px] bg-orange-200 text-orange-950 px-2 py-0.5 rounded-full font-black" id="maze-grammar-tag">Grammar</span>
+                            </div>
+
+                            <p id="maze-question-text" class="text-xs md:text-sm font-black text-slate-800 leading-relaxed"></p>
+
+                            <div id="maze-interactive-area" class="space-y-2">
+                                <!-- Dynamic rendering -->
+                            </div>
+
+                            <div id="maze-feedback" class="p-2 rounded-xl text-center font-black hidden text-xs"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="maze-success-box" class="max-w-md mx-auto bg-orange-50 border-4 border-orange-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🏁🎬🏆</span>
+                <h4 class="text-2xl font-heading font-black text-orange-950">Maze conquered!</h4>
+                <p class="text-sm text-slate-700 font-medium">Incredible! You solved all 10 grammar obstacles and conquered the maze. Time for writing practice!</p>
+                <button onclick="unlockAndGoToWriting()" class="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Start writing practice ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 5: WRITING PRACTICE -->
+        <section id="tab-writing-practice" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm space-y-6">
+                <!-- Header 2 levels -->
+                <div class="text-center space-y-1.5">
+                    <span class="text-xs uppercase bg-amber-100 text-amber-900 font-black px-4 py-1.5 rounded-full tracking-wide">Task 3: Translation Practice</span>
+                    <p class="text-xs md:text-sm text-slate-600 font-bold pt-1">Translate Vietnamese sentences to English using lesson vocabulary and target grammar structure.</p>
+                </div>
+
+                <div id="writing-questions-container" class="space-y-6 max-w-2xl mx-auto">
+                    <!-- Dynamic rendering -->
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="checkAllWritingAnswers()" class="px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl text-sm shadow-md transition cursor-pointer">Check all answers ➔</button>
+                </div>
+            </div>
+
+            <div id="writing-success-box" class="max-w-md mx-auto bg-orange-50 border-4 border-orange-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
+                <span class="text-5xl block animate-bounce">🎓📝✨</span>
+                <h4 class="text-2xl font-heading font-black text-orange-950">All tasks completed!</h4>
+                <p class="text-sm text-slate-700 font-medium">Excellent work on your translation practice. Click below to review your final summary.</p>
+                <button onclick="unlockAndGoToCompletion()" class="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">View lesson summary ➔</button>
+            </div>
+        </section>
+
+        <!-- TAB 6: COMPLETION / SUMMARY -->
+        <section id="tab-completion" class="tab-content hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-white border-4 border-orange-300 p-8 rounded-3xl space-y-6 shadow-xl text-center">
+                <div class="space-y-2">
+                    <span class="text-6xl block animate-bounce">🎓📺✨</span>
+                    <h3 class="text-3xl font-heading font-black text-orange-950">Congratulations!</h3>
+                    <p class="text-sm text-slate-600 font-bold">You have successfully mastered <span class="text-orange-600 font-black">E3_Lesson 14: Media</span>!</p>
+                </div>
+
+                <div class="bg-orange-50/60 p-5 rounded-2xl border border-orange-200 space-y-3 text-left">
+                    <h4 class="text-base font-black text-orange-950 border-b border-orange-200 pb-2">💡 Key grammar summary covered:</h4>
+                    <ul class="space-y-2 text-xs md:text-sm text-slate-700 font-bold">
+                        <li class="flex items-start gap-2"><span class="text-orange-600 font-black">1.</span> <span><b>Reported Speech:</b> Shifting tenses back (e.g., Present Simple ➔ Past Simple). <i>"I watch news" ➔ He said he watched news.</i></span></li>
+                        <li class="flex items-start gap-2"><span class="text-orange-600 font-black">2.</span> <span><b>Past Perfect:</b> <i>Had + V3/ed</i> for actions before another past point. (e.g., <i>The show had finished before I turned on the TV.</i>)</span></li>
+                        <li class="flex items-start gap-2"><span class="text-orange-600 font-black">3.</span> <span><b>Should for suggestions & offers:</b> <i>Should I / You should + V</i> (e.g., <i>Should I change the channel? / You should follow breaking news.</i>).</span></li>
+                    </ul>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="location.reload()" class="px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl shadow-md transition cursor-pointer text-sm">🔄 Restart lesson</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // LESSON 14 VOCABULARY DATA
+        const vocabularyData = [
+            { word: "get the news", ipa: "/ɡet ðə njuːz/", vi: "cập nhật tin tức", ex: "I usually get the news on my phone every morning.", icon: "📱" },
+            { word: "breaking news", ipa: "/ˌbreɪkɪŋ ˈnjuːz/", vi: "tin nóng", ex: "The TV is showing breaking news now.", icon: "🚨" },
+            { word: "follow the news", ipa: "/ˈfɒləʊ ðə njuːz/", vi: "theo dõi tin tức", ex: "My parents follow the news every evening.", icon: "📰" },
+            { word: "news headlines", ipa: "/njuːz ˈhedlaɪnz/", vi: "tiêu đề tin tức", ex: "I read the news headlines before school.", icon: "🗞️" },
+            { word: "share news stories", ipa: "/ʃeə(r) njuːz ˈstɔːriz/", vi: "chia sẻ các bản tin", ex: "People often share news stories on social media.", icon: "📲" },
+            { word: "journalist", ipa: "/ˈdʒɜːnəlɪst/", vi: "nhà báo", ex: "The journalist interviewed the famous singer.", icon: "🎙️" },
+            { word: "report the news", ipa: "/rɪˈpɔːt ðə njuːz/", vi: "đưa tin", ex: "Journalists report the news every day.", icon: "📺" },
+            { word: "TV channels", ipa: "/ˌtiː ˈviː ˈtʃænlz/", vi: "kênh truyền hình", ex: "There are many TV channels to choose from.", icon: "📡" },
+            { word: "TV series", ipa: "/ˌtiː ˈviː ˈsɪəriːz/", vi: "phim truyền hình dài tập", ex: "My favorite TV series is on Friday night.", icon: "🎬" },
+            { word: "episode", ipa: "/ˈepɪsəʊd/", vi: "tập phim", ex: "I watched the latest episode yesterday.", icon: "🎞️" },
+            { word: "season", ipa: "/ˈsiːzn/", vi: "mùa phim", ex: "I'm watching the second season now.", icon: "🗓️" },
+            { word: "season finale", ipa: "/ˌsiːzn fɪˈnɑːli/", vi: "tập cuối của mùa phim", ex: "The season finale was exciting.", icon: "🏆" },
+            { word: "catch your eye", ipa: "/kætʃ jɔː(r) aɪ/", vi: "thu hút ánh nhìn", ex: "The colorful poster caught my eye.", icon: "👀" },
+            { word: "grab your attention", ipa: "/ɡræb jɔː(r) əˈtenʃn/", vi: "thu hút sự chú ý", ex: "A good headline grabs your attention.", icon: "⚡" },
+            { word: "connect with", ipa: "/kəˈnekt wɪð/", vi: "tạo sự kết nối với", ex: "The story connected with many young people.", icon: "🤝" },
+            { word: "clear and simple message", ipa: "/klɪə(r) ænd ˈsɪmpl ˈmesɪdʒ/", vi: "thông điệp rõ ràng và đơn giản", ex: "A good advertisement has a clear and simple message.", icon: "💡" },
+            { word: "catchy slogan", ipa: "/ˈkætʃi ˈsləʊɡən/", vi: "khẩu hiệu dễ nhớ", ex: "The company uses a catchy slogan.", icon: "📣" },
+            { word: "logo", ipa: "/ˈləʊɡəʊ/", vi: "logo thương hiệu", ex: "The blue logo is easy to recognize.", icon: "🎨" },
+            { word: "brand", ipa: "/brænd/", vi: "thương hiệu", ex: "This brand is popular with teenagers.", icon: "🏷️" }
+        ];
+
+        // 10 MAZE OBSTACLE CHALLENGES (CHUẨN TRÌNH ĐỘ A2 + ĐA DẠNG HÌNH THỨC + DÙNG TỪ BÀI HỌC)
+        const mazeChallenges = [
+            {
+                type: "mcq",
+                grammar: "Reported speech",
+                q: "1/10: Change to reported speech: 'I watch news headlines,' said John.",
+                options: [
+                    "John said that he watched news headlines.",
+                    "John said that he watches news headlines.",
+                    "John told that he has watched news headlines."
+                ],
+                answer: "John said that he watched news headlines."
+            },
+            {
+                type: "fill",
+                grammar: "Past perfect",
+                q: "2/10: Complete: By the time I turned on the TV, the season finale ______ (start) already.",
+                answer: "had started"
+            },
+            {
+                type: "true_false",
+                grammar: "Should for advice",
+                q: "3/10: Is this sentence correct?\n'You should follow breaking news to know what happens.'",
+                options: ["True", "False"],
+                answer: "True"
+            },
+            {
+                type: "word_order",
+                grammar: "Should for offer",
+                q: "4/10: Arrange the words to form a polite offer:",
+                words: ["Should", "I", "change", "the", "TV channel", "?"],
+                answer: "Should I change the TV channel ?"
+            },
+            {
+                type: "mcq",
+                grammar: "Past perfect",
+                q: "5/10: Before the brand made a new logo, it ______ a catchy slogan.",
+                options: [
+                    "had used",
+                    "has used",
+                    "was using"
+                ],
+                answer: "had used"
+            },
+            {
+                type: "true_false",
+                grammar: "Reported speech",
+                q: "6/10: Is this reported speech correct?\nMary said: 'The journalist is here.' ➔ Mary said that the journalist was there.",
+                options: ["True", "False"],
+                answer: "True"
+            },
+            {
+                type: "mcq",
+                grammar: "Past perfect",
+                q: "7/10: She turned off the TV after she ______ the entire episode.",
+                options: [
+                    "had watched",
+                    "watches",
+                    "is watching"
+                ],
+                answer: "had watched"
+            },
+            {
+                type: "fill",
+                grammar: "Should for advice",
+                q: "8/10: Complete: You ______ (should/shouldn't) share news stories if you are not sure they are true.",
+                answer: "shouldn't"
+            },
+            {
+                type: "word_order",
+                grammar: "Reported speech",
+                q: "9/10: Arrange the words to form a reported sentence:",
+                words: ["He", "said", "the poster", "caught", "his eye"],
+                answer: "He said the poster caught his eye"
+            },
+            {
+                type: "mcq",
+                grammar: "Past perfect",
+                q: "10/10: The catchy slogan ______ everyone's attention before the show started.",
+                options: [
+                    "had grabbed",
+                    "grabs",
+                    "has grabbed"
+                ],
+                answer: "had grabbed"
+            }
+        ];
+
+        // WRITING PRACTICE QUESTIONS
+        const writingQuestions = [
+            {
+                vi: "Tôi thường cập nhật tin tức trên điện thoại vào mỗi buổi sáng.",
+                en: "I usually get the news on my phone every morning.",
+                hints: "get the news / Present Simple"
+            },
+            {
+                vi: "Nhà báo nói rằng cô ấy đã phỏng vấn ca sĩ nổi tiếng.",
+                en: "The journalist said that she had interviewed the famous singer.",
+                hints: "journalist / Reported speech / Past Perfect"
+            },
+            {
+                vi: "Tập cuối của mùa phim đã bắt đầu trước khi tôi về đến nhà.",
+                en: "The season finale had started before I came home.",
+                hints: "season finale / Past Perfect + Past Simple"
+            },
+            {
+                vi: "Tôi có nên chia sẻ bản tin này trên mạng xã hội không?",
+                en: "Should I share this news story on social media?",
+                hints: "Should I...? / share news stories"
+            },
+            {
+                vi: "Thương hiệu này sử dụng một khẩu hiệu rất dễ nhớ để thu hút sự chú ý.",
+                en: "This brand uses a catchy slogan to grab your attention.",
+                hints: "brand / catchy slogan / grab attention"
+            }
+        ];
+
+        // STATE MANAGEMENT
+        let currentTab = 'reference';
+        let flashcardQueue = [];
+        let currentCard = null;
+        let isFlipped = false;
+        let initialQueueLength = 0;
+
+        // BINGO STATE
+        let bingoGrid = [];
+        let bingoTargetIndex = -1;
+        let bingoTimer = null;
+        let bingoTimeLeft = 10;
+        let bingoActive = false;
+        let markedBingoCells = Array(16).fill(false);
+
+        // MAZE MAP DESIGN (8x8 Grid with 10 Obstacles)
+        const mazeLayout = [
+            [2, 0, 1, 3, 0, 0, 1, 3],
+            [1, 0, 1, 0, 1, 0, 1, 0],
+            [3, 0, 0, 0, 3, 0, 0, 0],
+            [0, 1, 1, 0, 1, 1, 1, 3],
+            [0, 3, 0, 0, 0, 3, 0, 0],
+            [1, 1, 1, 3, 1, 0, 1, 0],
+            [3, 0, 0, 0, 1, 3, 1, 3],
+            [0, 1, 1, 0, 0, 0, 0, 4]
+        ];
+
+        let playerPos = { r: 0, c: 0 };
+        let activeObstacle = null;
+        let solvedObstacles = 0;
+        let userWordOrder = [];
+
+        // Helper: Shuffle Array (Fisher-Yates)
+        function shuffleArray(arr) {
+            let array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function speakText(text, e) {
+            if (e) e.stopPropagation();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-orange-600', 'shadow-sm');
+                btn.classList.add('text-slate-500');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-500');
+                activeBtn.classList.add('bg-white', 'text-orange-600', 'shadow-sm');
+            }
+            currentTab = tabId;
+
+            if (tabId === 'writing-practice') {
+                renderWritingQuestions();
+            } else if (tabId === 'maze-game') {
+                initMaze();
+            }
+        }
+
+        // 1. WORD BANK RENDER
+        function renderWordBank() {
+            const tbody = document.getElementById('reference-table-body');
+            tbody.innerHTML = vocabularyData.map(item => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3.5 font-bold text-orange-950 flex items-center gap-2"><span>${item.icon || '📌'}</span> ${item.word}</td>
+                    <td class="p-3.5 text-slate-600">${item.vi}</td>
+                    <td class="p-3.5 text-orange-600 font-mono">${item.ipa}</td>
+                    <td class="p-3.5 text-slate-600 font-normal">${item.ex}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 2. FLASHCARDS LOGIC
+        function initFlashcards() {
+            flashcardQueue = vocabularyData.map(item => ({
+                ...item,
+                frontType: Math.random() < 0.5 ? 'vi' : 'en'
+            }));
+            initialQueueLength = flashcardQueue.length;
+            updateQueueUI();
+            nextCard();
+        }
+
+        function updateQueueUI() {
+            document.getElementById('queue-text').innerText = `${flashcardQueue.length} cards`;
+            const percent = ((initialQueueLength - flashcardQueue.length) / initialQueueLength) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function nextCard() {
+            if (flashcardQueue.length === 0) {
+                document.getElementById('flashcard-container').classList.add('hidden');
+                document.getElementById('flashcard-success-box').classList.remove('hidden');
+                return;
+            }
+            currentCard = flashcardQueue[0];
+            isFlipped = false;
+            
+            const cardInner = document.getElementById('flashcard-inner');
+            cardInner.classList.remove('card-flipped');
+
+            setTimeout(() => {
+                const fExtra = document.getElementById('f-extra-content');
+                const bExtra = document.getElementById('b-extra-content');
+
+                if (currentCard.frontType === 'vi') {
+                    document.getElementById('f-prompt').innerText = `${currentCard.icon || ''} ${currentCard.vi}`;
+                    fExtra.classList.add('hidden');
+
+                    document.getElementById('b-answer').innerText = currentCard.word;
+                    document.getElementById('b-ipa').innerText = currentCard.ipa;
+                    document.getElementById('b-example').innerText = `"${currentCard.ex}"`;
+                    bExtra.classList.remove('hidden');
+                } else {
+                    document.getElementById('f-prompt').innerText = `${currentCard.icon || ''} ${currentCard.word}`;
+                    document.getElementById('f-ipa').innerText = currentCard.ipa;
+                    document.getElementById('f-example').innerText = `"${currentCard.ex}"`;
+                    fExtra.classList.remove('hidden');
+
+                    document.getElementById('b-answer').innerText = currentCard.vi;
+                    bExtra.classList.add('hidden');
+                }
+            }, 150);
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            const cardInner = document.getElementById('flashcard-inner');
+            if (isFlipped) {
+                cardInner.classList.add('card-flipped');
+            } else {
+                cardInner.classList.remove('card-flipped');
+            }
+        }
+
+        function handleAnkiAction(action) {
+            if (!currentCard) return;
+            if (action === 'again') {
+                const card = flashcardQueue.shift();
+                flashcardQueue.push(card);
+            } else {
+                flashcardQueue.shift();
+            }
+            updateQueueUI();
+            nextCard();
+        }
+
+        function resetProgress() {
+            document.getElementById('flashcard-container').classList.remove('hidden');
+            document.getElementById('flashcard-success-box').classList.add('hidden');
+            initFlashcards();
+        }
+
+        function unlockAndGoToBingo() {
+            document.getElementById('btn-bingo-game').classList.remove('disabled-tab');
+            switchTab('bingo-game');
+            setupBingoBoard();
+        }
+
+        // 3. BINGO GAME LOGIC
+        function setupBingoBoard() {
+            let shuffled = shuffleArray(vocabularyData).slice(0, 16);
+            bingoGrid = shuffled;
+            markedBingoCells = Array(16).fill(false);
+
+            const container = document.getElementById('bingo-board');
+            container.innerHTML = bingoGrid.map((item, idx) => `
+                <button id="bingo-cell-${idx}" onclick="clickBingoCell(${idx})" class="h-20 bg-white border-2 border-orange-200 rounded-xl p-2 text-center text-xs font-black text-orange-950 hover:bg-orange-50 transition flex flex-col items-center justify-center gap-1 shadow-sm cursor-pointer">
+                    <span class="text-base">${item.icon}</span>
+                    <span class="leading-tight">${item.word}</span>
+                </button>
+            `).join('');
+        }
+
+        function startBingoGame() {
+            bingoActive = true;
+            document.getElementById('btn-start-bingo').classList.add('hidden');
+            nextBingoPrompt();
+        }
+
+        function nextBingoPrompt() {
+            if (!bingoActive) return;
+
+            let unselectedIndices = [];
+            for (let i = 0; i < 16; i++) {
+                if (!markedBingoCells[i]) {
+                    unselectedIndices.push(i);
+                }
+            }
+
+            if (unselectedIndices.length === 0) return;
+
+            let randomPos = Math.floor(Math.random() * unselectedIndices.length);
+            bingoTargetIndex = unselectedIndices[randomPos];
+            let item = bingoGrid[bingoTargetIndex];
+
+            document.getElementById('bingo-prompt-text').innerText = item.vi;
+            bingoTimeLeft = 10;
+            document.getElementById('bingo-timer').innerText = `${bingoTimeLeft}s`;
+
+            clearInterval(bingoTimer);
+            bingoTimer = setInterval(() => {
+                bingoTimeLeft--;
+                document.getElementById('bingo-timer').innerText = `${bingoTimeLeft}s`;
+                if (bingoTimeLeft <= 0) {
+                    clearInterval(bingoTimer);
+                    nextBingoPrompt();
+                }
+            }, 1000);
+        }
+
+        // CẢI TIẾN 1: KHI CHỌN ĐÚNG BINGO -> CLEAR TIMER NGAY LẬP TỨC VÀ CHUYỂN TỪ
+        function clickBingoCell(idx) {
+            if (!bingoActive) return;
+
+            if (idx === bingoTargetIndex) {
+                // HỦY BỘ ĐẾM 10s NGAY LẬP TỨC
+                clearInterval(bingoTimer);
+
+                markedBingoCells[idx] = true;
+                const cell = document.getElementById(`bingo-cell-${idx}`);
+                cell.classList.add('bingo-marked');
+                cell.disabled = true;
+
+                speakText(bingoGrid[idx].word);
+                checkBingoLines();
+
+                if (calculateBingoLines() < 3) {
+                    // CHUYỂN NGAY QUA TỪ TIẾP THEO MÀ KHÔNG ĐỜI 10s
+                    setTimeout(nextBingoPrompt, 600);
+                }
+            }
+        }
+
+        function calculateBingoLines() {
+            let lines = 0;
+            for (let r = 0; r < 4; r++) {
+                if (markedBingoCells[r*4] && markedBingoCells[r*4+1] && markedBingoCells[r*4+2] && markedBingoCells[r*4+3]) lines++;
+            }
+            for (let c = 0; c < 4; c++) {
+                if (markedBingoCells[c] && markedBingoCells[c+4] && markedBingoCells[c+8] && markedBingoCells[c+12]) lines++;
+            }
+            if (markedBingoCells[0] && markedBingoCells[5] && markedBingoCells[10] && markedBingoCells[15]) lines++;
+            if (markedBingoCells[3] && markedBingoCells[6] && markedBingoCells[9] && markedBingoCells[12]) lines++;
+
+            return lines;
+        }
+
+        function checkBingoLines() {
+            let totalLines = calculateBingoLines();
+            document.getElementById('bingo-lines-count').innerHTML = `Lines completed: <span class="text-orange-600 text-lg">${totalLines} / 3</span>`;
+
+            if (totalLines >= 3) {
+                bingoActive = false;
+                clearInterval(bingoTimer);
+                document.getElementById('bingo-board').classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('bingo-success-box').classList.remove('hidden');
+            }
+        }
+
+        function unlockAndGoToMaze() {
+            document.getElementById('btn-maze-game').classList.remove('disabled-tab');
+            switchTab('maze-game');
+        }
+
+        // 4. MAZE GAME LOGIC
+        function initMaze() {
+            playerPos = { r: 0, c: 0 };
+            solvedObstacles = 0;
+            renderMazeMap();
+            document.getElementById('maze-score-text').innerText = `0 / 10`;
+            document.getElementById('maze-status-text').innerText = "10 Challenges Required";
+            document.getElementById('maze-challenge-box').classList.add('hidden');
+
+            window.removeEventListener('keydown', handleMazeKeyDown);
+            window.addEventListener('keydown', handleMazeKeyDown);
+        }
+
+        function handleMazeKeyDown(e) {
+            if (currentTab !== 'maze-game') return;
+            if (['ArrowUp', 'KeyW'].includes(e.code)) movePlayer(-1, 0);
+            if (['ArrowDown', 'KeyS'].includes(e.code)) movePlayer(1, 0);
+            if (['ArrowLeft', 'KeyA'].includes(e.code)) movePlayer(0, -1);
+            if (['ArrowRight', 'KeyD'].includes(e.code)) movePlayer(0, 1);
+        }
+
+        function renderMazeMap() {
+            const mapContainer = document.getElementById('maze-board-map');
+            mapContainer.innerHTML = '';
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cellVal = mazeLayout[r][c];
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'maze-cell ';
+
+                    if (r === playerPos.r && c === playerPos.c) {
+                        cellDiv.className += 'maze-player';
+                        cellDiv.innerHTML = '🚶‍♂️';
+                    } else if (cellVal === 1) {
+                        cellDiv.className += 'maze-wall';
+                        cellDiv.innerHTML = '🧱';
+                    } else if (cellVal === 3) {
+                        cellDiv.className += 'maze-obstacle';
+                        cellDiv.innerHTML = '❓';
+                    } else if (cellVal === 4) {
+                        cellDiv.className += 'maze-finish';
+                        cellDiv.innerHTML = '🏆';
+                    } else if (cellVal === 2) {
+                        cellDiv.className += 'maze-path';
+                        cellDiv.innerHTML = '🚩';
+                    } else {
+                        cellDiv.className += 'maze-path';
+                    }
+
+                    mapContainer.appendChild(cellDiv);
+                }
+            }
+        }
+
+        function movePlayer(dr, dc) {
+            if (activeObstacle) return;
+
+            const newR = playerPos.r + dr;
+            const newC = playerPos.c + dc;
+
+            if (newR < 0 || newR >= 8 || newC < 0 || newC >= 8) return;
+            if (mazeLayout[newR][newC] === 1) return;
+
+            if (mazeLayout[newR][newC] === 3) {
+                playerPos = { r: newR, c: newC };
+                renderMazeMap();
+                triggerMazeQuestion(newR, newC);
+                return;
+            }
+
+            if (mazeLayout[newR][newC] === 4) {
+                if (solvedObstacles >= 10) {
+                    playerPos = { r: newR, c: newC };
+                    renderMazeMap();
+                    document.getElementById('maze-status-text').innerText = "Completed!";
+                    document.getElementById('maze-success-box').classList.remove('hidden');
+                } else {
+                    alert(`⚠️ YOU MUST SOLVE ALL 10 OBSTACLES BEFORE FINISHING!\n\nYou have solved ${solvedObstacles}/10 obstacles. Please navigate back and clear all ❓ tiles!`);
+                }
+                return;
+            }
+
+            playerPos = { r: newR, c: newC };
+            renderMazeMap();
+        }
+
+        // CẢI TIẾN 2: TRỘN NGẪU NHIÊN ĐÁP ÁN & ĐA DẠNG HÌNH THỨC THỬ THÁCH
+        function triggerMazeQuestion(r, c) {
+            activeObstacle = { r, c };
+            const challenge = mazeChallenges[solvedObstacles % mazeChallenges.length];
+
+            const box = document.getElementById('maze-challenge-box');
+            box.classList.remove('hidden');
+
+            document.getElementById('maze-challenge-title').innerText = `Obstacle ${solvedObstacles + 1}/10`;
+            document.getElementById('maze-grammar-tag').innerText = challenge.grammar;
+            document.getElementById('maze-question-text').innerText = challenge.q;
+
+            const feedback = document.getElementById('maze-feedback');
+            feedback.classList.add('hidden');
+
+            const area = document.getElementById('maze-interactive-area');
+            area.innerHTML = '';
+
+            // DẠNG 1 & 2: MULTIPLE CHOICE HOẶC TRUE/FALSE (TRỘN ĐÁP ÁN NGẪU NHIÊN)
+            if (challenge.type === 'mcq' || challenge.type === 'true_false') {
+                // Shuffle options ngẫu nhiên
+                let randomizedOptions = shuffleArray(challenge.options);
+                area.innerHTML = randomizedOptions.map(opt => `
+                    <button onclick="submitMazeAnswer('${opt.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="w-full text-left p-2.5 bg-white border-2 border-orange-200 hover:bg-orange-100 font-bold text-xs text-orange-950 rounded-xl transition cursor-pointer shadow-sm">
+                        ${opt}
+                    </button>
+                `).join('');
+            } 
+            // DẠNG 3: WORD ORDER (SẮP XẾP TỪ)
+            else if (challenge.type === 'word_order') {
+                userWordOrder = [];
+                let shuffledWords = shuffleArray(challenge.words);
+                area.innerHTML = `
+                    <div id="word-order-pool" class="flex flex-wrap gap-1.5 p-2 bg-white rounded-xl border border-orange-200 min-h-[42px]">
+                        ${shuffledWords.map((w, i) => `
+                            <button id="w-btn-${i}" onclick="selectWordOrder('${w}', 'w-btn-${i}')" class="px-2.5 py-1 bg-orange-100 hover:bg-orange-200 text-orange-950 font-bold text-xs rounded-lg transition border border-orange-300">${w}</button>
+                        `).join('')}
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[10px] text-slate-500 font-black">Your constructed sentence:</span>
+                        <div id="word-order-target" class="p-2.5 bg-amber-100/60 rounded-xl border-2 border-dashed border-orange-300 text-xs font-bold text-orange-950 min-h-[38px]"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resetWordOrder()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black rounded-lg text-xs transition">Clear</button>
+                        <button onclick="submitWordOrderAnswer()" class="flex-1 py-1.5 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-lg text-xs shadow-sm transition">Check order</button>
+                    </div>
+                `;
+            } 
+            // DẠNG 4: FILL-IN-THE-BLANK
+            else {
+                area.innerHTML = `
+                    <div class="flex gap-2">
+                        <input type="text" id="maze-text-input" placeholder="Type answer..." class="flex-1 p-2 bg-white border-2 border-orange-200 rounded-xl font-bold text-xs text-slate-800 outline-none focus:border-orange-500">
+                        <button onclick="submitMazeTextAnswer()" class="px-4 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl text-xs shadow-sm transition cursor-pointer">Submit</button>
+                    </div>
+                `;
+            }
+        }
+
+        // XỬ LÝ SẮP XẾP TỪ (WORD ORDER)
+        function selectWordOrder(word, btnId) {
+            userWordOrder.push(word);
+            document.getElementById(btnId).style.visibility = 'hidden';
+            document.getElementById('word-order-target').innerText = userWordOrder.join(' ');
+        }
+
+        function resetWordOrder() {
+            userWordOrder = [];
+            const challenge = mazeChallenges[solvedObstacles % mazeChallenges.length];
+            triggerMazeQuestion(activeObstacle.r, activeObstacle.c);
+        }
+
+        function submitWordOrderAnswer() {
+            submitMazeAnswer(userWordOrder.join(' '));
+        }
+
+        function submitMazeAnswer(selected) {
+            const challenge = mazeChallenges[solvedObstacles % mazeChallenges.length];
+            const feedback = document.getElementById('maze-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected.trim().toLowerCase() === challenge.answer.toLowerCase()) {
+                feedback.className = "p-2 rounded-xl text-center font-black bg-emerald-100 text-emerald-800 text-xs";
+                feedback.innerHTML = `✨ Correct! Path cleared!`;
+                
+                solvedObstacles++;
+                document.getElementById('maze-score-text').innerText = `${solvedObstacles} / 10`;
+                
+                // Clear obstacle on grid map
+                mazeLayout[activeObstacle.r][activeObstacle.c] = 0;
+
+                setTimeout(() => {
+                    activeObstacle = null;
+                    document.getElementById('maze-challenge-box').classList.add('hidden');
+                    renderMazeMap();
+                }, 900);
+            } else {
+                feedback.className = "p-2 rounded-xl text-center font-black bg-rose-100 text-rose-800 text-xs";
+                feedback.innerHTML = `❌ Incorrect! Try again.`;
+            }
+        }
+
+        function submitMazeTextAnswer() {
+            const input = document.getElementById('maze-text-input');
+            if (input) submitMazeAnswer(input.value);
+        }
+
+        function unlockAndGoToWriting() {
+            document.getElementById('btn-writing-practice').classList.remove('disabled-tab');
+            switchTab('writing-practice');
+        }
+
+        // 5. WRITING PRACTICE LOGIC
+        function renderWritingQuestions() {
+            const container = document.getElementById('writing-questions-container');
+            container.innerHTML = writingQuestions.map((q, idx) => `
+                <div class="bg-orange-50/50 p-4 rounded-2xl border border-orange-200 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <span class="text-xs font-black uppercase text-orange-700 bg-orange-100 px-3 py-1 rounded-full">Sentence ${idx + 1}</span>
+                        <span class="text-[11px] text-slate-500 font-black">Grammar Focus: ${q.hints}</span>
+                    </div>
+                    <p class="text-sm md:text-base font-black text-orange-950">${q.vi}</p>
+                    <div>
+                        <input type="text" id="writing-input-${idx}" placeholder="Type English translation..." class="w-full p-3 bg-white border-2 border-orange-200 rounded-xl font-bold text-xs md:text-sm text-slate-800 outline-none focus:border-orange-500">
+                    </div>
+                    <div id="writing-feedback-${idx}" class="hidden p-3 rounded-xl text-xs font-black"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkAllWritingAnswers() {
+            let allFilled = true;
+            writingQuestions.forEach((q, idx) => {
+                const val = document.getElementById(`writing-input-${idx}`).value.trim();
+                if (!val) allFilled = false;
+            });
+
+            if (!allFilled) {
+                alert("⚠️ Please answer all translation questions before checking!");
+                return;
+            }
+
+            writingQuestions.forEach((q, idx) => {
+                const val = document.getElementById(`writing-input-${idx}`).value.trim();
+                const feedback = document.getElementById(`writing-feedback-${idx}`);
+                feedback.classList.remove('hidden');
+
+                if (val.toLowerCase() === q.en.toLowerCase()) {
+                    feedback.className = "p-3 rounded-xl text-xs font-black bg-emerald-100 text-emerald-800";
+                    feedback.innerHTML = `✨ Perfect translation!`;
+                } else {
+                    feedback.className = "p-3 rounded-xl text-xs font-black bg-amber-100 text-amber-900";
+                    feedback.innerHTML = `💡 Key Answer: <b>${q.en}</b>`;
+                }
+            });
+
+            document.getElementById('writing-success-box').classList.remove('hidden');
+            document.getElementById('writing-success-box').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function unlockAndGoToCompletion() {
+            document.getElementById('btn-completion').classList.remove('disabled-tab');
+            switchTab('completion');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWordBank();
+            initFlashcards();
+        });
+    </script>
+</body>
+</html>
