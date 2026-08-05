@@ -160,7 +160,7 @@
                 <div class="text-center space-y-2">
                     <span class="text-xs uppercase bg-indigo-100 text-indigo-700 font-black px-4 py-1.5 rounded-full tracking-wide">Task 2: Practice</span>
                     <h3 class="text-2xl font-heading font-black text-slate-900">Fill in the Blanks</h3>
-                    <p class="text-sm text-slate-500 font-medium max-w-xl mx-auto">Complete the sentences using the core words from Lesson 1. Pay attention to grammar (Present Simple, Past Simple, etc.)!</p>
+                    <p class="text-sm text-slate-500 font-medium max-w-xl mx-auto">Complete the sentences using the core words from Lesson 1. Pay attention to grammar!</p>
                 </div>
 
                 <div id="gapfill-questions-container" class="space-y-4">
@@ -177,7 +177,7 @@
             <div id="gapfill-success-box" class="max-w-md mx-auto bg-emerald-50 border-4 border-emerald-300 p-6 rounded-3xl text-center space-y-4 hidden shadow-sm">
                 <span class="text-5xl block animate-bounce">🎯🎉🌟</span>
                 <h4 class="text-2xl font-heading font-black text-emerald-900">Great Job!</h4>
-                <p class="text-sm text-slate-700 font-medium leading-relaxed">You passed the gap-fill challenge! Now you're ready for the Sentence Unscramble game!</p>
+                <p class="text-sm text-slate-700 font-medium leading-relaxed" id="gapfill-result-msg">You are ready for the Sentence Unscramble game!</p>
                 <button onclick="unlockAndGoToArrange()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">Play Sentence Unscramble ➔</button>
             </div>
         </section>
@@ -224,19 +224,25 @@
             </div>
 
             <!-- FINAL CONGRATULATIONS CARD AFTER UNSCRAMBLE -->
-            <div id="arrange-success-box" class="bg-slate-900 text-white p-8 rounded-3xl max-w-md mx-auto text-center space-y-4 hidden shadow-xl border-4 border-amber-400">
+            <div id="arrange-success-box" class="bg-slate-900 text-white p-8 rounded-3xl max-w-md mx-auto text-center space-y-5 hidden shadow-xl border-4 border-amber-400">
                 <span class="text-6xl block animate-bounce">🦄🏆🌟</span>
-                <h3 class="text-2xl font-heading font-black text-amber-300">Lesson 1 Accomplished!</h3>
-                <p class="text-slate-300 font-medium text-base leading-relaxed">Congratulations! You have mastered all vocabulary and successfully built all sentences!</p>
+                <h3 class="text-3xl font-heading font-black text-amber-300">Lesson 1 Accomplished!</h3>
+                <p class="text-slate-300 font-medium text-base leading-relaxed">Congratulations! You have completed all tasks in Lesson 1: Vocabulary, Gap Fill, and Unscramble Games!</p>
+                
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Final Score</p>
+                    <p class="text-2xl font-black text-emerald-400"><span id="final-score-display">10</span> / 10 ⭐</p>
+                </div>
+
                 <div class="pt-4 border-t border-slate-800">
-                    <button onclick="restartEntireSession()" class="text-xs font-black text-amber-400 underline hover:text-amber-500 cursor-pointer tracking-wide">Restart Lesson 1 Practice</button>
+                    <button onclick="restartEntireSession()" class="w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black rounded-xl shadow-md transition cursor-pointer text-sm tracking-wide">🔄 Restart Lesson 1 Practice</button>
                 </div>
             </div>
         </section>
     </main>
 
     <script>
-        // MASTER VOCABULARY LIST (E3_Lesson 1)
+        // MASTER VOCABULARY LIST (E3_Lesson 1) - Updated social person to sociable person
         const vocabularyData = [
             // People & Relationships
             { word: "children", ipa: "/ˈtʃɪldrən/", vi: "trẻ em, con cái", ex: "The children are playing happily in the park." },
@@ -255,7 +261,7 @@
             { word: "foodie", ipa: "/ˈfuːdi/", vi: "người sành ăn", ex: "As a foodie, he loves trying new street food." },
             { word: "traveler", ipa: "/ˈtrævlə(r)/", vi: "người thích đi du lịch", ex: "My brother is a traveler who has visited 10 countries." },
             { word: "sports fan", ipa: "/spɔːts fæn/", vi: "người hâm mộ thể thao", ex: "My dad is a big sports fan and watches football every weekend." },
-            { word: "social person", ipa: "/ˈsəʊʃl ˈpɜːsn/", vi: "người hòa đồng, thích giao tiếp", ex: "She is a social person who makes friends easily." },
+            { word: "sociable person", ipa: "/ˈsəʊʃəbl ˈpɜːsn/", vi: "người hòa đồng, thích giao tiếp", ex: "She is a sociable person who makes friends easily." },
             { word: "bookworm", ipa: "/ˈbʊkwɜːm/", vi: "mọt sách", ex: "He is a real bookworm; he reads two books a week." },
             { word: "gamer", ipa: "/ˈɡeɪmə(r)/", vi: "người chơi điện tử", ex: "Many teenagers become gamers in their free time." },
             { word: "blogger", ipa: "/ˈblɒɡə(r)/", vi: "người viết blog", ex: "The travel blogger shares great pictures of her trips." },
@@ -286,12 +292,12 @@
             { word: "retire", ipa: "/rɪˈtaɪə(r)/", vi: "nghỉ hưu", ex: "My grandfather plans to retire at the age of 65." }
         ];
 
-        // TASK 2: 15 GAP-FILL ITEMS
+        // TASK 2: 15 GAP-FILL ITEMS (Updated answer to sociable person)
         const gapFillData = [
             { id: 1, sentence: "My sister reads books every evening because she is a real ________.", answer: "bookworm", hint: "mọt sách" },
             { id: 2, sentence: "Our ________ explains grammar very clearly in every lesson.", answer: "teacher", hint: "giáo viên" },
             { id: 3, sentence: "They met at university and decided to ________ last year.", answer: "get married", hint: "kết hôn" },
-            { id: 4, sentence: "He is a ________ person who enjoys making new friends.", answer: "social person", hint: "người hòa đồng" },
+            { id: 4, sentence: "He is a ________ who enjoys making new friends.", answer: "sociable person", hint: "người hòa đồng" },
             { id: 5, sentence: "My ________ live in the countryside, so I visit them on weekends.", answer: "grandparents", hint: "ông bà" },
             { id: 6, sentence: "After finishing high school, she wants to ________ in London.", answer: "go to college", hint: "học đại học" },
             { id: 7, sentence: "Be ________ when teaching children because they learn slowly.", answer: "patient", hint: "kiên nhẫn" },
@@ -311,7 +317,7 @@
             { id: 1, target: "She is a bookworm because she loves reading .", vi: "Cô ấy là một mọt sách vì cô ấy thích đọc sách." },
             { id: 2, target: "They got married after finishing college last year .", vi: "Họ đã kết hôn sau khi học xong đại học năm ngoái." },
             { id: 3, target: "Our teacher is very patient with all students .", vi: "Giáo viên của chúng tôi rất kiên nhẫn với tất cả học sinh." },
-            { id: 4, sentence: "He wants to get a job in Hanoi .", target: "He wants to get a job in Hanoi .", vi: "Anh ấy muốn tìm một công việc ở Hà Nội." },
+            { id: 4, target: "He wants to get a job in Hanoi .", vi: "Anh ấy muốn tìm một công việc ở Hà Nội." },
             { id: 5, target: "An animal lover usually takes good care of pets .", vi: "Một người yêu động vật thường chăm sóc tốt cho thú cưng." },
             { id: 6, target: "My uncle plans to retire next summer .", vi: "Chú của tôi có kế hoạch nghỉ hưu vào mùa hè tới." },
             { id: 7, target: "She is friendly and makes friends very easily .", vi: "Cô ấy thân thiện và kết bạn rất dễ dàng." },
@@ -319,7 +325,6 @@
             { id: 9, target: "Generous people always share things with others .", vi: "Những người hào phóng luôn chia sẻ mọi thứ với người khác." }
         ];
 
-        // UNLOCK STATES
         let gapfillUnlocked = false;
         let arrangeUnlocked = false;
 
@@ -435,19 +440,9 @@
         }
 
         function resetProgress() {
-            flashcardStates.forEach(c => c.done = false);
+            flashcardStates = vocabularyData.map(v => ({ word: v.word, done: false }));
             currentFlashcardIndex = 0;
             updateFlashcardUI();
-        }
-
-        function speakWord(e) {
-            if (e) e.stopPropagation();
-            const text = document.getElementById('f-word').innerText;
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                window.speechSynthesis.speak(utterance);
-            }
         }
 
         function unlockAndGoToGapfill() {
@@ -456,60 +451,68 @@
             switchTab('gapfill');
         }
 
-        /* --- TASK 2: GAP FILL EXERCISE --- */
+        function speakWord(event) {
+            event.stopPropagation();
+            const text = document.getElementById('f-word').innerText;
+            if (!text) return;
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }
+
+        /* --- TASK 2: GAP FILL SYSTEM --- */
         function renderGapFillQuestions() {
             const container = document.getElementById('gapfill-questions-container');
-            container.innerHTML = gapFillData.map((q, idx) => {
-                const parts = q.sentence.split('________');
-                return `
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">Question ${idx + 1}</span>
-                            <span class="text-xs font-bold text-amber-600">Gợi ý: ${q.hint}</span>
-                        </div>
-                        <p class="text-sm font-bold text-slate-800 leading-relaxed">
-                            ${parts[0]}
-                            <input type="text" id="gap-input-${q.id}" autocomplete="off" class="mx-1 px-3 py-1 bg-white border-2 border-indigo-300 rounded-lg text-indigo-900 font-bold text-sm focus:outline-none focus:border-indigo-600 inline-block w-40 text-center" placeholder="type word..." />
-                            ${parts[1]}
-                        </p>
+            container.innerHTML = gapFillData.map((q, idx) => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3" id="gf-item-${q.id}">
+                    <div class="space-y-1 flex-1">
+                        <span class="text-xs font-black text-indigo-600 uppercase">Question ${idx + 1} (${q.hint})</span>
+                        <p class="text-sm md:text-base font-bold text-slate-800">${q.sentence.replace('________', `<input type="text" id="gf-input-${q.id}" class="px-3 py-1 mx-1 bg-white border-2 border-indigo-200 focus:border-indigo-500 rounded-lg outline-none font-bold text-indigo-900 text-center w-44" placeholder="type answer...">`)}</p>
+                        <div id="gf-ans-display-${q.id}" class="text-xs font-bold text-rose-600 hidden pt-1"></div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
         }
 
         function checkGapFillAnswers() {
             let correctCount = 0;
-            gapFillData.forEach(q => {
-                const inputEl = document.getElementById(`gap-input-${q.id}`);
-                const userVal = inputEl.value.trim().toLowerCase();
-                const targetVal = q.answer.toLowerCase();
 
-                if (userVal === targetVal) {
+            gapFillData.forEach(q => {
+                const inputEl = document.getElementById(`gf-input-${q.id}`);
+                const ansDisplay = document.getElementById(`gf-ans-display-${q.id}`);
+                const userVal = inputEl.value.trim().toLowerCase();
+                const expected = q.answer.toLowerCase();
+
+                if (userVal === expected) {
                     correctCount++;
-                    inputEl.classList.remove('border-indigo-300', 'border-rose-500', 'bg-rose-50');
-                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                    inputEl.className = "px-3 py-1 mx-1 bg-emerald-100 border-2 border-emerald-500 rounded-lg outline-none font-bold text-emerald-900 text-center w-44";
+                    ansDisplay.classList.add('hidden');
                 } else {
-                    inputEl.classList.remove('border-indigo-300', 'border-emerald-500', 'bg-emerald-50');
-                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                    inputEl.className = "px-3 py-1 mx-1 bg-rose-100 border-2 border-rose-500 rounded-lg outline-none font-bold text-rose-900 text-center w-44";
+                    ansDisplay.innerText = `Correct Answer: "${q.answer}"`;
+                    ansDisplay.classList.remove('hidden');
                 }
             });
 
-            const feedbackEl = document.getElementById('gapfill-feedback');
-            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-amber-100', 'text-amber-800');
+            const feedback = document.getElementById('gapfill-feedback');
+            const resultMsg = document.getElementById('gapfill-result-msg');
+            
+            feedback.classList.remove('hidden');
 
             if (correctCount === gapFillData.length) {
-                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
-                feedbackEl.innerText = `🎉 Perfect! You got ${correctCount}/${gapFillData.length} correct!`;
-                
-                setTimeout(() => {
-                    document.getElementById('gapfill-success-box').classList.remove('hidden');
-                    arrangeUnlocked = true;
-                    document.getElementById('btn-arrange').classList.remove('disabled-tab');
-                }, 800);
+                feedback.className = "p-4 rounded-2xl text-center font-black bg-emerald-100 text-emerald-800 border border-emerald-300 block";
+                feedback.innerHTML = `🎉 Perfect! ${correctCount}/${gapFillData.length} correct! You can now move to Unscramble.`;
+                resultMsg.innerText = `You scored ${correctCount}/${gapFillData.length}! You're ready for the Unscramble challenge.`;
             } else {
-                feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
-                feedbackEl.innerText = `You got ${correctCount}/${gapFillData.length} correct. Check red inputs and try again!`;
+                feedback.className = "p-4 rounded-2xl text-center font-black bg-amber-100 text-amber-900 border border-amber-300 block";
+                feedback.innerHTML = `⚠️ You got ${correctCount}/${gapFillData.length} correct. The correct answers are displayed in red above. You can still move forward!`;
+                resultMsg.innerText = `You scored ${correctCount}/${gapFillData.length}. Review the red answers above and proceed to Sentence Unscramble whenever you are ready!`;
             }
+
+            // Always unlock next section so students can check answers and move on
+            arrangeUnlocked = true;
+            document.getElementById('btn-arrange').classList.remove('disabled-tab');
+            document.getElementById('gapfill-success-box').classList.remove('hidden');
         }
 
         function unlockAndGoToArrange() {
@@ -518,35 +521,38 @@
             switchTab('arrange');
         }
 
-        /* --- TASK 3: UNSCRAMBLE GAME MECHANICS --- */
+        /* --- TASK 3: FLOATING UNSCRAMBLE GAME --- */
         function initArrangeSentenceGame() {
             if (arrangeCurrentIndex >= gameSentencesPool.length) {
-                document.getElementById('arrange-workspace').classList.add('hidden');
-                document.getElementById('arrange-success-box').classList.remove('hidden');
+                showFinalCongratulationsScreen();
                 return;
             }
 
             document.getElementById('arrange-workspace').classList.remove('hidden');
             document.getElementById('arrange-success-box').classList.add('hidden');
 
+            const currentData = gameSentencesPool[arrangeCurrentIndex];
             document.getElementById('arr-current-num').innerText = arrangeCurrentIndex + 1;
+            document.getElementById('arr-vi-hint').innerText = currentData.vi;
             document.getElementById('arr-score-text').innerText = arrangeScore;
 
-            const currentObj = gameSentencesPool[arrangeCurrentIndex];
-            document.getElementById('arr-vi-hint').innerText = currentObj.vi;
+            const feedback = document.getElementById('arrange-feedback');
+            feedback.classList.add('hidden');
 
-            document.getElementById('sentence-drop-zone').innerHTML = '';
-            document.getElementById('arrange-feedback').classList.add('hidden');
             document.getElementById('arr-check-btn').classList.remove('hidden');
             document.getElementById('arr-next-btn').classList.add('hidden');
 
-            const tokens = currentObj.target.trim().split(/\s+/);
-            const shuffled = shuffleArray(tokens.map((word, idx) => ({ id: `tile-${idx}-${Date.now()}`, word })));
+            document.getElementById('sentence-drop-zone').innerHTML = '';
 
-            setupFloatingTiles(shuffled);
+            const words = currentData.target.split(' ').filter(w => w.trim().length > 0);
+            const shuffled = [...words].sort(() => Math.random() - 0.5);
+
+            setupFloatingArena(shuffled);
         }
 
-        function setupFloatingTiles(tokenObjs) {
+        function setupFloatingArena(words) {
+            stopFloatingAnimationLoop();
+
             const arena = document.getElementById('word-bank-arena');
             arena.innerHTML = '';
             animatedObjects = [];
@@ -554,58 +560,177 @@
             const arenaWidth = arena.clientWidth || 600;
             const arenaHeight = arena.clientHeight || 220;
 
-            tokenObjs.forEach((item, index) => {
-                const el = document.createElement('div');
-                const colorStyle = pastelColors[index % pastelColors.length];
-                
-                el.className = `floating-tile border-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-black shadow-sm transition-transform ${colorStyle}`;
-                el.innerText = item.word;
-                el.dataset.word = item.word;
-                el.id = item.id;
-                
-                el.draggable = true;
-                el.ondragstart = (e) => handleTileDragStart(e, item.id, item.word);
-                el.onclick = () => moveTileToDropZone(el);
+            words.forEach((w, idx) => {
+                const tile = document.createElement('div');
+                const colorClass = pastelColors[idx % pastelColors.length];
+                tile.className = `floating-tile px-4 py-2 border-2 rounded-2xl font-black text-sm shadow-md transition-transform cursor-grab ${colorClass}`;
+                tile.innerText = w;
+                tile.dataset.word = w;
 
-                arena.appendChild(el);
+                arena.appendChild(tile);
 
-                const tileWidth = 90;
-                const tileHeight = 40;
-                const posX = Math.random() * Math.max(10, arenaWidth - tileWidth);
-                const posY = Math.random() * Math.max(10, arenaHeight - tileHeight);
-                
-                let vx = (Math.random() - 0.5) * 0.8;
-                let vy = (Math.random() - 0.5) * 0.8;
-                if (Math.abs(vx) < 0.2) vx = 0.3;
-                if (Math.abs(vy) < 0.2) vy = 0.3;
+                const tileWidth = tile.offsetWidth || 80;
+                const tileHeight = tile.offsetHeight || 40;
 
-                el.style.left = `${posX}px`;
-                el.style.top = `${posY}px`;
+                const maxX = Math.max(10, arenaWidth - tileWidth - 15);
+                const maxY = Math.max(10, arenaHeight - tileHeight - 15);
 
-                animatedObjects.push({
-                    el,
+                const posX = Math.random() * maxX;
+                const posY = Math.random() * maxY;
+
+                tile.style.left = `${posX}px`;
+                tile.style.top = `${posY}px`;
+
+                const speed = 0.4 + Math.random() * 0.4;
+                const angle = Math.random() * Math.PI * 2;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+
+                const obj = {
+                    element: tile,
                     x: posX,
                     y: posY,
-                    vx,
-                    vy,
-                    width: tileWidth,
-                    height: tileHeight,
+                    vx: vx,
+                    vy: vy,
+                    w: tileWidth,
+                    h: tileHeight,
                     isDragging: false
-                });
+                };
 
-                attachTouchAndMouseDrag(el, animatedObjects[animatedObjects.length - 1]);
+                attachTileEvents(obj);
+                animatedObjects.push(obj);
             });
 
             startFloatingAnimationLoop();
         }
 
-        function startFloatingAnimationLoop() {
-            stopFloatingAnimationLoop();
+        function attachTileEvents(obj) {
+            const el = obj.element;
 
-            function animate() {
+            const onPointerDown = (e) => {
+                e.preventDefault();
+                obj.isDragging = true;
+                el.style.zIndex = '100';
+
+                const rect = el.getBoundingClientRect();
+                const startX = e.clientX || (e.touches && e.touches[0].clientX);
+                const startY = e.clientY || (e.touches && e.touches[0].clientY);
+                const offsetX = startX - rect.left;
+                const offsetY = startY - rect.top;
+
                 const arena = document.getElementById('word-bank-arena');
-                if (!arena) return;
+                const arenaRect = arena.getBoundingClientRect();
 
+                const onPointerMove = (moveEvt) => {
+                    if (!obj.isDragging) return;
+                    const curX = moveEvt.clientX || (moveEvt.touches && moveEvt.touches[0].clientX);
+                    const curY = moveEvt.clientY || (moveEvt.touches && moveEvt.touches[0].clientY);
+
+                    obj.x = curX - arenaRect.left - offsetX;
+                    obj.y = curY - arenaRect.top - offsetY;
+
+                    el.style.left = `${obj.x}px`;
+                    el.style.top = `${obj.y}px`;
+                };
+
+                const onPointerUp = (upEvt) => {
+                    obj.isDragging = false;
+                    el.style.zIndex = '10';
+
+                    window.removeEventListener('pointermove', onPointerMove);
+                    window.removeEventListener('pointerup', onPointerUp);
+                    window.removeEventListener('touchmove', onPointerMove);
+                    window.removeEventListener('touchend', onPointerUp);
+
+                    const dropZone = document.getElementById('sentence-drop-zone');
+                    const dzRect = dropZone.getBoundingClientRect();
+                    const dropX = upEvt.clientX || (upEvt.changedTouches && upEvt.changedTouches[0].clientX);
+                    const dropY = upEvt.clientY || (upEvt.changedTouches && upEvt.changedTouches[0].clientY);
+
+                    if (dropX >= dzRect.left && dropX <= dzRect.right && dropY >= dzRect.top && dropY <= dzRect.bottom) {
+                        moveTileToDropZone(obj);
+                    }
+                };
+
+                window.addEventListener('pointermove', onPointerMove);
+                window.addEventListener('pointerup', onPointerUp);
+                window.addEventListener('touchmove', onPointerMove, { passive: false });
+                window.addEventListener('touchend', onPointerUp);
+            };
+
+            el.addEventListener('pointerdown', onPointerDown);
+            el.addEventListener('click', () => {
+                if (!obj.isDragging) {
+                    moveTileToDropZone(obj);
+                }
+            });
+        }
+
+        function moveTileToDropZone(obj) {
+            animatedObjects = animatedObjects.filter(o => o !== obj);
+
+            const dropZone = document.getElementById('sentence-drop-zone');
+            const tile = obj.element;
+
+            tile.style.position = 'relative';
+            tile.style.left = 'auto';
+            tile.style.top = 'auto';
+            tile.style.cursor = 'pointer';
+            tile.className = "px-4 py-2 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-sm hover:bg-indigo-700 transition cursor-pointer";
+
+            tile.onclick = () => {
+                returnTileToArena(tile);
+            };
+
+            dropZone.appendChild(tile);
+        }
+
+        function returnTileToArena(tile) {
+            const word = tile.innerText;
+            tile.remove();
+
+            const arena = document.getElementById('word-bank-arena');
+            const arenaWidth = arena.clientWidth || 600;
+            const arenaHeight = arena.clientHeight || 220;
+
+            const newTile = document.createElement('div');
+            const colorClass = pastelColors[animatedObjects.length % pastelColors.length];
+            newTile.className = `floating-tile px-4 py-2 border-2 rounded-2xl font-black text-sm shadow-md transition-transform cursor-grab ${colorClass}`;
+            newTile.innerText = word;
+
+            arena.appendChild(newTile);
+
+            const tileWidth = newTile.offsetWidth || 80;
+            const tileHeight = newTile.offsetHeight || 40;
+
+            const posX = Math.random() * Math.max(10, arenaWidth - tileWidth - 10);
+            const posY = Math.random() * Math.max(10, arenaHeight - tileHeight - 10);
+
+            newTile.style.left = `${posX}px`;
+            newTile.style.top = `${posY}px`;
+
+            const speed = 0.4 + Math.random() * 0.4;
+            const angle = Math.random() * Math.PI * 2;
+
+            const obj = {
+                element: newTile,
+                x: posX,
+                y: posY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                w: tileWidth,
+                h: tileHeight,
+                isDragging: false
+            };
+
+            attachTileEvents(obj);
+            animatedObjects.push(obj);
+        }
+
+        function startFloatingAnimationLoop() {
+            const arena = document.getElementById('word-bank-arena');
+
+            function step() {
                 const arenaWidth = arena.clientWidth || 600;
                 const arenaHeight = arena.clientHeight || 220;
 
@@ -615,19 +740,23 @@
                     obj.x += obj.vx;
                     obj.y += obj.vy;
 
-                    if (obj.x <= 0) { obj.x = 0; obj.vx *= -1; }
-                    if (obj.x >= arenaWidth - 80) { obj.x = arenaWidth - 80; obj.vx *= -1; }
-                    if (obj.y <= 0) { obj.y = 0; obj.vy *= -1; }
-                    if (obj.y >= arenaHeight - 38) { obj.y = arenaHeight - 38; obj.vy *= -1; }
+                    if (obj.x <= 0 || obj.x + obj.w >= arenaWidth) {
+                        obj.vx *= -1;
+                        obj.x = Math.max(0, Math.min(obj.x, arenaWidth - obj.w));
+                    }
+                    if (obj.y <= 0 || obj.y + obj.h >= arenaHeight) {
+                        obj.vy *= -1;
+                        obj.y = Math.max(0, Math.min(obj.y, arenaHeight - obj.h));
+                    }
 
-                    obj.el.style.left = `${obj.x}px`;
-                    obj.el.style.top = `${obj.y}px`;
+                    obj.element.style.left = `${obj.x}px`;
+                    obj.element.style.top = `${obj.y}px`;
                 });
 
-                animationFrameId = requestAnimationFrame(animate);
+                animationFrameId = requestAnimationFrame(step);
             }
 
-            animationFrameId = requestAnimationFrame(animate);
+            animationFrameId = requestAnimationFrame(step);
         }
 
         function stopFloatingAnimationLoop() {
@@ -637,141 +766,33 @@
             }
         }
 
-        function attachTouchAndMouseDrag(element, animObj) {
-            let startX = 0, startY = 0;
-
-            element.addEventListener('pointerdown', (e) => {
-                if (e.button !== 0 && e.pointerType === 'mouse') return;
-                animObj.isDragging = true;
-                startX = e.clientX - animObj.x;
-                startY = e.clientY - animObj.y;
-                element.setPointerCapture(e.pointerId);
-            });
-
-            element.addEventListener('pointermove', (e) => {
-                if (!animObj.isDragging) return;
-                const arena = document.getElementById('word-bank-arena');
-                const arenaRect = arena.getBoundingClientRect();
-
-                let newX = e.clientX - arenaRect.left - 30;
-                let newY = e.clientY - arenaRect.top - 15;
-
-                animObj.x = newX;
-                animObj.y = newY;
-                element.style.left = `${newX}px`;
-                element.style.top = `${newY}px`;
-            });
-
-            element.addEventListener('pointerup', (e) => {
-                if (!animObj.isDragging) return;
-                animObj.isDragging = false;
-
-                const dropZone = document.getElementById('sentence-drop-zone');
-                const dropRect = dropZone.getBoundingClientRect();
-
-                if (e.clientY >= dropRect.top && e.clientY <= dropRect.bottom &&
-                    e.clientX >= dropRect.left && e.clientX <= dropRect.right) {
-                    moveTileToDropZone(element);
-                }
-            });
-        }
-
-        function moveTileToDropZone(tileEl) {
-            const dropZone = document.getElementById('sentence-drop-zone');
-            
-            animatedObjects = animatedObjects.filter(obj => obj.el !== tileEl);
-
-            tileEl.style.position = 'static';
-            tileEl.style.left = 'auto';
-            tileEl.style.top = 'auto';
-            tileEl.classList.remove('floating-tile');
-            tileEl.classList.add('cursor-pointer', 'transform', 'hover:scale-105');
-
-            tileEl.onclick = () => returnTileToArena(tileEl);
-
-            dropZone.appendChild(tileEl);
-        }
-
-        function returnTileToArena(tileEl) {
-            const arena = document.getElementById('word-bank-arena');
-            
-            tileEl.remove();
-
-            const arenaWidth = arena.clientWidth || 600;
-            const arenaHeight = arena.clientHeight || 220;
-
-            const posX = Math.random() * (arenaWidth - 90);
-            const posY = Math.random() * (arenaHeight - 40);
-
-            tileEl.style.position = 'absolute';
-            tileEl.style.left = `${posX}px`;
-            tileEl.style.top = `${posY}px`;
-            tileEl.classList.add('floating-tile');
-
-            arena.appendChild(tileEl);
-
-            const animObj = {
-                el: tileEl,
-                x: posX,
-                y: posY,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                width: 90,
-                height: 40,
-                isDragging: false
-            };
-
-            tileEl.onclick = () => moveTileToDropZone(tileEl);
-            attachTouchAndMouseDrag(tileEl, animObj);
-
-            animatedObjects.push(animObj);
-        }
-
-        function handleTileDragStart(e, id, word) {
-            e.dataTransfer.setData('text/plain', JSON.stringify({ id, word }));
-        }
-
-        function allowDrop(e) { e.preventDefault(); }
-        function handleDragEnter(e) { e.currentTarget.classList.add('drop-zone-active'); }
-        function handleDragLeave(e) { e.currentTarget.classList.remove('drop-zone-active'); }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drop-zone-active');
-            const dataStr = e.dataTransfer.getData('text/plain');
-            if (!dataStr) return;
-
-            const data = JSON.parse(dataStr);
-            const tileEl = document.getElementById(data.id);
-            if (tileEl && tileEl.parentElement.id === 'word-bank-arena') {
-                moveTileToDropZone(tileEl);
-            }
-        }
+        function allowDrop(ev) { ev.preventDefault(); }
+        function handleDragEnter(ev) { ev.currentTarget.classList.add('drop-zone-active'); }
+        function handleDragLeave(ev) { ev.currentTarget.classList.remove('drop-zone-active'); }
+        function handleDrop(ev) { ev.currentTarget.classList.remove('drop-zone-active'); }
 
         function checkArrangedSentence() {
             const dropZone = document.getElementById('sentence-drop-zone');
-            const constructedSentence = Array.from(dropZone.children)
-                .map(child => child.dataset.word)
-                .join(' ')
-                .trim();
+            const tiles = dropZone.querySelectorAll('div');
 
+            const builtSentence = Array.from(tiles).map(t => t.innerText.trim()).join(' ');
             const targetSentence = gameSentencesPool[arrangeCurrentIndex].target.trim();
-            const feedbackEl = document.getElementById('arrange-feedback');
 
-            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-300', 'bg-rose-100', 'text-rose-800', 'border-rose-300');
+            const feedback = document.getElementById('arrange-feedback');
+            feedback.classList.remove('hidden');
 
-            if (constructedSentence === targetSentence) {
-                arrangeScore += 10;
+            if (builtSentence === targetSentence) {
+                arrangeScore += 1;
                 document.getElementById('arr-score-text').innerText = arrangeScore;
 
-                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
-                feedbackEl.innerText = "✨ Perfect Match! Excellent grammar structure! ✨";
+                feedback.className = "text-center font-black text-base py-3 rounded-xl border bg-emerald-100 text-emerald-800 border-emerald-300 block";
+                feedback.innerText = "🎉 Excellent! Correct sentence structure!";
 
                 document.getElementById('arr-check-btn').classList.add('hidden');
                 document.getElementById('arr-next-btn').classList.remove('hidden');
             } else {
-                feedbackEl.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-300');
-                feedbackEl.innerText = "❌ Not quite right. Tap tiles to adjust their order and try again!";
+                feedback.className = "text-center font-black text-base py-3 rounded-xl border bg-rose-100 text-rose-800 border-rose-300 block";
+                feedback.innerText = "❌ Not quite right. Try rearranging the words!";
             }
         }
 
@@ -784,19 +805,17 @@
             initArrangeSentenceGame();
         }
 
-        function shuffleArray(array) {
-            let arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
+        function showFinalCongratulationsScreen() {
+            document.getElementById('arrange-workspace').classList.add('hidden');
+            const successBox = document.getElementById('arrange-success-box');
+            document.getElementById('final-score-display').innerText = arrangeScore;
+            successBox.classList.remove('hidden');
         }
 
         function restartEntireSession() {
-            resetProgress();
             arrangeCurrentIndex = 0;
             arrangeScore = 0;
+            resetProgress();
             switchTab('reference');
         }
     </script>
